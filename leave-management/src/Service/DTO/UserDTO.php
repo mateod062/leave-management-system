@@ -15,29 +15,6 @@ class UserDTO
         private string $role
     ) {}
 
-    public static function fromEntity(User $user): UserDTO
-    {
-        return new UserDTO(
-            $user->getId(),
-            $user->getUsername(),
-            $user->getEmail(),
-            $user->getPassword(),
-            $user->getRole()
-        );
-    }
-
-    public static function toDTO(UserDTO $userDTO): User
-    {
-        $user = new User();
-        $user->setId($userDTO->getId());
-        $user->setUsername($userDTO->getUsername());
-        $user->setEmail($userDTO->getEmail());
-        $user->setPassword($userDTO->getPassword());
-        $user->setRole(UserRole::tryFrom($userDTO->getRole()));
-
-        return $user;
-    }
-
     public function getId(): int
     {
         return $this->id;

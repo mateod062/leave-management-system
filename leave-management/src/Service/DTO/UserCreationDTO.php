@@ -10,11 +10,6 @@ class UserCreationDTO
     {
     }
 
-    public static function fromEntity(User $user): UserCreationDTO
-    {
-        return new UserCreationDTO($user->getUsername(), $user->getEmail(), $user->getPassword());
-    }
-
     public function getUsername(): string
     {
         return $this->username;

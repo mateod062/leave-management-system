@@ -8,11 +8,6 @@ class NotificationDTO
 {
     public function __construct(private string $message, private int $userId) {}
 
-    public static function fromEntity(Notification $notification): NotificationDTO
-    {
-        return new NotificationDTO($notification->getMessage(), $notification->getUser()->getId());
-    }
-
     public function getMessage(): string
     {
         return $this->message;
