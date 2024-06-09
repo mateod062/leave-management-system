@@ -14,27 +14,31 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::BIGINT)]
-    private ?int $id;
+    private int $id;
 
     #[ORM\Column(length: 50, unique: true)]
     #[NotBlank]
-    private ?string $username;
+    private string $username;
 
     #[ORM\Column(length: 100, unique: true)]
     #[Email]
-    private ?string $email;
+    private string $email;
 
     #[ORM\Column(length: 255)]
-    private ?string $password;
+    private string $password;
 
     #[ORM\Column(type: "user_role")]
-    private string $role;
+    private UserRole $role;
 
     #[ORM\OneToOne(targetEntity: Team::class, inversedBy: "teamLead")]
     private Team $leadingTeam;
 
     #[ORM\OneToMany(targetEntity: Team::class, mappedBy: "projectManager")]
     private array $managedTeams = [];
+
+    #[ORM\OneToOne(targetEntity: Team::class, inversedBy: "members")]
+    #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
+    private ?Team $team;
 
     public function getLeadingTeam(): ?Team
     {
@@ -66,16 +70,19 @@ class User
         $this->team = $team;
     }
 
-    #[ORM\OneToOne(targetEntity: Team::class, inversedBy: "members")]
-    #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
-    private ?Team $team;
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function setId(int $getId): static
+    {
+        $this->id = $getId;
+
+        return $this;
+    }
+
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -87,7 +94,7 @@ class User
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -99,7 +106,10 @@ class User
         return $this;
     }
 
-    public function getPassword(): ?string
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -111,12 +121,21 @@ class User
         return $this;
     }
 
-    public function getRole(): ?string
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
     {
-        return $this->role;
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
-    public function setRole(string $role): static
+    public function getRole(): string
+    {
+        return $this->role->value;
+    }
+
+    public function setRole(UserRole $role): static
     {
         $this->role = $role;
 
