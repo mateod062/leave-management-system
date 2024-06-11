@@ -101,7 +101,7 @@ class LeaveRequest
         $this->reason = $reason;
     }
 
-    public function isTeamLeaderApproval(): bool
+    public function teamLeaderApproved(): bool
     {
         return $this->teamLeaderApproval;
     }
@@ -111,7 +111,7 @@ class LeaveRequest
         $this->teamLeaderApproval = $teamLeaderApproval;
     }
 
-    public function isProjectManagerApproval(): bool
+    public function projectManagerApproved(): bool
     {
         return $this->projectManagerApproval;
     }

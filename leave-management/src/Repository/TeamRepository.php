@@ -21,28 +21,22 @@ class TeamRepository extends ServiceEntityRepository
         parent::__construct($registry, Team::class);
     }
 
-//    /**
-//     * @return Team[] Returns an array of Team objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('t.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function save(Team $team): Team
+    {
+        if ($team->getId() === null) {
+            $this->_em->persist($team);
+            $this->_em->flush();
+            return $team;
+        } else {
+            $this->_em->merge($team);
+            $this->_em->flush();
+            return $team;
+        }
+    }
 
-//    public function findOneBySomeField($value): ?Team
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function delete(Team $team): void
+    {
+        $this->_em->remove($team);
+        $this->_em->flush();
+    }
 }

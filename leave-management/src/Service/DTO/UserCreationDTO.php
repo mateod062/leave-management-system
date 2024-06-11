@@ -6,9 +6,11 @@ use App\Entity\User;
 
 class UserCreationDTO
 {
-    public function __construct(private string $username, private string $email, private string $password)
-    {
-    }
+    public function __construct(
+        private string $username,
+        private string $email,
+        private string $password
+    ){}
 
     public function getUsername(): string
     {

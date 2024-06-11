@@ -21,28 +21,22 @@ class LeaveBalanceRepository extends ServiceEntityRepository
         parent::__construct($registry, LeaveBalance::class);
     }
 
-//    /**
-//     * @return LeaveBalance[] Returns an array of LeaveBalance objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('l.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function save(LeaveBalance $leaveBalance): LeaveBalance
+    {
+        if ($leaveBalance->getId() === null) {
+            $this->_em->persist($leaveBalance);
+            $this->_em->flush();
+            return $leaveBalance;
+        } else {
+            $this->_em->merge($leaveBalance);
+            $this->_em->flush();
+            return $leaveBalance;
+        }
+    }
 
-//    public function findOneBySomeField($value): ?LeaveBalance
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function delete(LeaveBalance $leaveBalance): void
+    {
+        $this->_em->remove($leaveBalance);
+        $this->_em->flush();
+    }
 }

@@ -2,11 +2,27 @@
 
 namespace App\Service\DTO;
 
-use App\Entity\Notification;
+use DateTime;
 
 class NotificationDTO
 {
-    public function __construct(private string $message, private int $userId) {}
+    public function __construct(
+        private string $message,
+        private int $userId,
+        private DateTime $createdAt
+    ) {
+        $this->createdAt = new DateTime();
+    }
+
+    public function getCreatedAt(): DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
 
     public function getMessage(): string
     {

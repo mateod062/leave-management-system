@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\LeaveRequest;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,28 +22,38 @@ class LeaveRequestRepository extends ServiceEntityRepository
         parent::__construct($registry, LeaveRequest::class);
     }
 
-//    /**
-//     * @return LeaveRequest[] Returns an array of LeaveRequest objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('l.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function save(LeaveRequest $leaveRequest): LeaveRequest
+    {
+        if ($leaveRequest->getId() === null) {
+            $this->_em->persist($leaveRequest);
+            $this->_em->flush();
+            return $leaveRequest;
+        } else {
+            $this->_em->merge($leaveRequest);
+            $this->_em->flush();
+            return $leaveRequest;
+        }
+    }
 
-//    public function findOneBySomeField($value): ?LeaveRequest
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function delete(LeaveRequest $leaveRequest): void
+    {
+        $this->_em->remove($leaveRequest);
+        $this->_em->flush();
+    }
+
+    public function findByTeamAndMonth(int $teamId, int $month, int $year): array
+    {
+        $startDate = new DateTime("$year-$month-01");
+        $endDate = (clone $startDate)->modify('last day of this month');
+
+        return $this->createQueryBuilder('lr')
+            ->innerJoin('lr.user', 'u')
+            ->andWhere('u.team = :teamId')
+            ->andWhere('lr.startDate BETWEEN :startDate AND :endDate')
+            ->setParameter('teamId', $teamId)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->getQuery()
+            ->getResult();
+    }
 }
