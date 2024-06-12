@@ -6,10 +6,11 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\DTO\UserDTO;
 use App\Service\Mapper\MapperService;
+use App\Service\User\Interface\UserQueryServiceInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use ReflectionException;
 
-class UserQueryService
+class UserQueryService implements UserQueryServiceInterface
 {
     private const ENTITY_NAME = 'User';
 
@@ -24,6 +25,16 @@ class UserQueryService
     public function getUsers(): array
     {
         $users = $this->userRepository->findAll();
+
+        return array_map(fn(User $user) => $this->mapperService->mapToDTO($user), $users);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function getTeamMembers(int $teamId): array
+    {
+        $users = $this->userRepository->findBy(['team' => $teamId]);
 
         return array_map(fn(User $user) => $this->mapperService->mapToDTO($user), $users);
     }

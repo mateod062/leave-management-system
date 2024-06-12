@@ -23,20 +23,18 @@ class LeaveBalanceRepository extends ServiceEntityRepository
 
     public function save(LeaveBalance $leaveBalance): LeaveBalance
     {
-        if ($leaveBalance->getId() === null) {
-            $this->_em->persist($leaveBalance);
-            $this->_em->flush();
-            return $leaveBalance;
-        } else {
-            $this->_em->merge($leaveBalance);
-            $this->_em->flush();
-            return $leaveBalance;
+        if (!$this->getEntityManager()->contains($leaveBalance)) {
+            $this->getEntityManager()->persist($leaveBalance);
         }
+
+        $this->getEntityManager()->flush();
+
+        return $leaveBalance;
     }
 
     public function delete(LeaveBalance $leaveBalance): void
     {
-        $this->_em->remove($leaveBalance);
-        $this->_em->flush();
+        $this->getEntityManager()->remove($leaveBalance);
+        $this->getEntityManager()->flush();
     }
 }

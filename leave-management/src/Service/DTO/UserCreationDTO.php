@@ -2,17 +2,15 @@
 
 namespace App\Service\DTO;
 
-use App\Entity\User;
-
 class UserCreationDTO
 {
     public function __construct(
-        private string $username,
-        private string $email,
-        private string $password
+        private ?string $username = null,
+        private ?string $email = null,
+        private ?string $password = null
     ){}
 
-    public function getUsername(): string
+    public function getUsername(): ?string
     {
         return $this->username;
     }
@@ -22,7 +20,7 @@ class UserCreationDTO
         $this->username = $username;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -32,7 +30,7 @@ class UserCreationDTO
         $this->email = $email;
     }
 
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }

@@ -73,9 +73,7 @@ class UserPersistenceService implements UserPersistenceServiceInterface
         $user = $this->mapperService->mapToEntity($userCreationDTO, User::class);
         $user->setRole($role);
 
-        $this->userRepository->save($user);
-
-        return $this->mapperService->mapToDTO($user);
+        return $this->mapperService->mapToDTO($this->userRepository->save($user));
     }
 
     /**

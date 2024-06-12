@@ -25,8 +25,8 @@ class MapperService implements MapperServiceInterface
     public function mapToDTO(object $entity, string $dtoClass = null): object
     {
         if ($dtoClass === null) {
-            $className = (new ReflectionClass($entity))->getName();
-            $dtoClass = $className . 'DTO';
+            $className = (new ReflectionClass($entity))->getShortName();
+            $dtoClass = 'App\\Service\\DTO\\' . $className . 'DTO';
         }
         
         $dto = new $dtoClass();
@@ -58,18 +58,20 @@ class MapperService implements MapperServiceInterface
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function mapToEntity(object $dto, string $entity = null): object
+    public function mapToEntity(object $dto, string $entityClass = null): object
     {
-        if ($entity === null) {
-            $className = str_replace('DTO', '', (new ReflectionClass($dto))->getName());
-            $entity = new $className();
+        if ($entityClass === null) {
+            $className = str_replace('DTO', '', (new ReflectionClass($dto))->getShortName());
+            $entityClass = '\\App\\Entity\\' . $className;
         }
 
+        $entity = new $entityClass();
         $dtoReflection = new ReflectionClass($dto);
-        $entityReflection = new ReflectionClass($entity);
+        $entityReflection = new ReflectionClass($entityClass);
 
         foreach ($dtoReflection->getProperties() as $property) {
             $propertyName = $property->getName();
+
             try {
                 if ($entityReflection->hasProperty($propertyName)) {
                     $value = $this->propertyAccessor->getValue($dto, $propertyName);

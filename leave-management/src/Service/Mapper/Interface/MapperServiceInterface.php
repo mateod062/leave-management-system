@@ -17,8 +17,8 @@ interface MapperServiceInterface
      * Map a DTO class to its corresponding entity class
      *
      * @param object $dto
-     * @param string|null $entity
+     * @param string|null $entityClass
      * @return object
      */
-    public function mapToEntity(object $dto, string $entity = null): object;
+    public function mapToEntity(object $dto, string $entityClass = null): object;
 }

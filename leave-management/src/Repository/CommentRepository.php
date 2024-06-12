@@ -23,20 +23,18 @@ class CommentRepository extends ServiceEntityRepository
 
     public function save(Comment $comment): Comment
     {
-        if ($comment->getId() === null) {
-            $this->_em->persist($comment);
-            $this->_em->flush();
-            return $comment;
-        } else {
-            $this->_em->merge($comment);
-            $this->_em->flush();
-            return $comment;
+        if (!$this->getEntityManager()->contains($comment)) {
+            $this->getEntityManager()->persist($comment);
         }
+
+        $this->getEntityManager()->flush();
+
+        return $comment;
     }
 
     public function delete(Comment $comment): void
     {
-        $this->_em->remove($comment);
-        $this->_em->flush();
+        $this->getEntityManager()->remove($comment);
+        $this->getEntityManager()->flush();
     }
 }

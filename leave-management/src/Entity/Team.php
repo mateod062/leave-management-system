@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TeamRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -15,7 +16,7 @@ class Team
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::BIGINT)]
-    private int $id;
+    private ?int $id = null;
 
     #[ORM\Column(length: 50)]
     #[NotBlank]
@@ -26,13 +27,13 @@ class Team
     #[NotNull]
     private User $teamLead;
 
-    #[ORM\OneToMany(targetEntity: User::class, mappedBy: "managedTeams")]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "managedTeams")]
     #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     #[NotNull]
     private User $projectManager;
 
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: "team")]
-    private ArrayCollection $members;
+    private Collection $members;
 
     public function __construct()
     {
@@ -69,17 +70,17 @@ class Team
         $this->projectManager = $projectManager;
     }
 
-    public function getMembers(): ArrayCollection
+    public function getMembers(): Collection
     {
         return $this->members;
     }
 
-    public function setMembers(ArrayCollection $members): void
+    public function setMembers(Collection $members): void
     {
         $this->members = $members;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

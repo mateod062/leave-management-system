@@ -8,14 +8,14 @@ use App\Entity\UserRole;
 class UserDTO
 {
     public function __construct(
-        private ?int $id,
-        private string $username,
-        private string $email,
-        private string $password,
-        private string $role
+        private ?int $id = null,
+        private ?string $username = null,
+        private ?string $email = null,
+        private ?string $password = null,
+        private ?string $role = null
     ) {}
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -25,7 +25,7 @@ class UserDTO
         $this->id = $id;
     }
 
-    public function getUsername(): string
+    public function getUsername(): ?string
     {
         return $this->username;
     }
@@ -35,7 +35,7 @@ class UserDTO
         $this->username = $username;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -45,7 +45,7 @@ class UserDTO
         $this->email = $email;
     }
 
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -55,7 +55,7 @@ class UserDTO
         $this->password = $password;
     }
 
-    public function getRole(): string
+    public function getRole(): ?string
     {
         return $this->role;
     }

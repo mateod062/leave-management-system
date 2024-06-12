@@ -23,20 +23,18 @@ class NotificationRepository extends ServiceEntityRepository
 
     public function save(Notification $notification): Notification
     {
-        if ($notification->getId() === null) {
-            $this->_em->persist($notification);
-            $this->_em->flush();
-            return $notification;
-        } else {
-            $this->_em->merge($notification);
-            $this->_em->flush();
-            return $notification;
+        if (!$this->getEntityManager()->contains($notification)) {
+            $this->getEntityManager()->persist($notification);
         }
+
+        $this->getEntityManager()->flush();
+
+        return $notification;
     }
 
     public function delete(Notification $notification): void
     {
-        $this->_em->remove($notification);
-        $this->_em->flush();
+        $this->getEntityManager()->remove($notification);
+        $this->getEntityManager()->flush();
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\Email;
@@ -14,7 +16,7 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::BIGINT)]
-    private int $id;
+    private ?int $id = null;
 
     #[ORM\Column(length: 50, unique: true)]
     #[NotBlank]
@@ -34,11 +36,16 @@ class User
     private Team $leadingTeam;
 
     #[ORM\OneToMany(targetEntity: Team::class, mappedBy: "projectManager")]
-    private array $managedTeams = [];
+    private Collection $managedTeams;
 
     #[ORM\OneToOne(targetEntity: Team::class, inversedBy: "members")]
     #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
     private ?Team $team;
+
+    public function __construct()
+    {
+        $this->managedTeams = new ArrayCollection();
+    }
 
     public function getLeadingTeam(): ?Team
     {
@@ -50,12 +57,12 @@ class User
         $this->leadingTeam = $leadingTeam;
     }
 
-    public function getManagedTeams(): array
+    public function getManagedTeams(): Collection
     {
         return $this->managedTeams;
     }
 
-    public function setManagedTeams(array $managedTeams): void
+    public function setManagedTeams(Collection $managedTeams): void
     {
         $this->managedTeams = $managedTeams;
     }
@@ -70,7 +77,7 @@ class User
         $this->team = $team;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

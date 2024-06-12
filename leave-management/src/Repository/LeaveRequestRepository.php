@@ -24,21 +24,19 @@ class LeaveRequestRepository extends ServiceEntityRepository
 
     public function save(LeaveRequest $leaveRequest): LeaveRequest
     {
-        if ($leaveRequest->getId() === null) {
-            $this->_em->persist($leaveRequest);
-            $this->_em->flush();
-            return $leaveRequest;
-        } else {
-            $this->_em->merge($leaveRequest);
-            $this->_em->flush();
-            return $leaveRequest;
+        if (!$this->getEntityManager()->contains($leaveRequest)) {
+            $this->getEntityManager()->persist($leaveRequest);
         }
+
+        $this->getEntityManager()->flush();
+
+        return $leaveRequest;
     }
 
     public function delete(LeaveRequest $leaveRequest): void
     {
-        $this->_em->remove($leaveRequest);
-        $this->_em->flush();
+        $this->getEntityManager()->remove($leaveRequest);
+        $this->getEntityManager()->flush();
     }
 
     public function findByTeamAndMonth(int $teamId, int $month, int $year): array
