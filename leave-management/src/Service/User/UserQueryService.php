@@ -5,6 +5,7 @@ namespace App\Service\User;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\DTO\UserDTO;
+use App\Service\DTO\UserResponseDTO;
 use App\Service\Mapper\MapperService;
 use App\Service\User\Interface\UserQueryServiceInterface;
 use Doctrine\ORM\EntityNotFoundException;
@@ -36,7 +37,7 @@ class UserQueryService implements UserQueryServiceInterface
     {
         $users = $this->userRepository->findBy(['team' => $teamId]);
 
-        return array_map(fn(User $user) => $this->mapperService->mapToDTO($user), $users);
+        return array_map(fn(User $user) => $this->mapperService->mapToDTO($user, UserResponseDTO::class), $users);
     }
 
     /**
@@ -62,20 +63,6 @@ class UserQueryService implements UserQueryServiceInterface
 
         if (!$user) {
             throw new EntityNotFoundException(sprintf('%s with email %s not found', self::ENTITY_NAME, $email));
-        }
-
-        return $this->mapperService->mapToDTO($user);
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    public function getUserByUsername(string $username): UserDTO
-    {
-        $user = $this->userRepository->findOneBy(['username' => $username]);
-
-        if (!$user) {
-            throw new EntityNotFoundException(sprintf('%s with username %s not found', self::ENTITY_NAME, $username));
         }
 
         return $this->mapperService->mapToDTO($user);
