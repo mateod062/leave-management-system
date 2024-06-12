@@ -29,12 +29,15 @@ security:
 
     role_hierarchy:
         ROLE_ADMIN: [ROLE_PROJECT_MANAGER, ROLE_TEAM_LEAD]
-        ROLE_PROJECT_MANAGER: ROLE_USER
+        ROLE_PROJECT_MANAGER: ROLE_EMPLOYEE
         ROLE_TEAM_LEAD: ROLE_EMPLOYEE
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        # - { path: ^/users, roles: ROLE_ADMIN }
+        # - { path: ^/users/.*, roles: ROLE_ADMIN }
+        # - { path: ^/users/team, roles: ROLE_PROJECT_MANAGER, ROLE_TEAM_LEAD }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
