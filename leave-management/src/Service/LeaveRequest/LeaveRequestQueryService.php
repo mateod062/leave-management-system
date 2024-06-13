@@ -42,15 +42,16 @@ class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
             $days[] = new LeaveRequestDayDTO($day, $leaveRequestsByDay[$day]);
         }
 
-        $calendar = new LeaveRequestCalendarDTO($startDate->format('F'), $year, $days);
-
-        return $calendar;
+        return new LeaveRequestCalendarDTO($startDate->format('F'), $year, $days);
     }
 
     public function getLeaveRequests(LeaveRequestFilterDTO $filter): array
     {
         $criteria = [];
 
+        if ($filter->getId() !== null) {
+            $criteria['id'] = $filter->getId();
+        }
         if ($filter->getUserId() !== null) {
             $criteria['user'] = $filter->getUserId();
         }

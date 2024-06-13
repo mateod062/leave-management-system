@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\DTO\UserDTO;
 use App\Service\DTO\UserResponseDTO;
+use App\Service\LeaveBalance\LeaveBalanceService;
 use App\Service\Mapper\MapperService;
 use App\Service\User\Interface\UserQueryServiceInterface;
 use Doctrine\ORM\EntityNotFoundException;
@@ -17,7 +18,8 @@ class UserQueryService implements UserQueryServiceInterface
 
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly MapperService $mapperService
+        private readonly MapperService $mapperService,
+        private readonly LeaveBalanceService $leaveBalanceService
     ){}
 
     /**
@@ -37,7 +39,11 @@ class UserQueryService implements UserQueryServiceInterface
     {
         $users = $this->userRepository->findBy(['team' => $teamId]);
 
-        return array_map(fn(User $user) => $this->mapperService->mapToDTO($user, UserResponseDTO::class), $users);
+        return array_map(function (User $user) {
+            $responseDTO = $this->mapperService->mapToDTO($user, UserResponseDTO::class);
+            $responseDTO->setLeaveBalance($this->leaveBalanceService->getLeaveBalance($user->getId()));
+            return $responseDTO;
+            }, $users);
     }
 
     /**

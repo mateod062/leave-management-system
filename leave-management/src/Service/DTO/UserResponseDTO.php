@@ -8,8 +8,19 @@ class UserResponseDTO
         private ?int    $id = null,
         private ?string $username = null,
         private ?string $email = null,
+        private ?int $leaveBalance = null,
         private ?string $role = null
     ) {}
+
+    public function getLeaveBalance(): ?int
+    {
+        return $this->leaveBalance;
+    }
+
+    public function setLeaveBalance(?int $leaveBalance): void
+    {
+        $this->leaveBalance = $leaveBalance;
+    }
 
     public function setId(int $id): void
     {

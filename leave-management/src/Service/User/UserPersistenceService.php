@@ -4,6 +4,7 @@ namespace App\Service\User;
 
 use App\Entity\User;
 use App\Entity\UserRole;
+use App\Event\UserCreatedEvent;
 use App\Repository\UserRepository;
 use App\Service\DTO\UserCreationDTO;
 use App\Service\DTO\UserDTO;
@@ -13,6 +14,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use ReflectionException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class UserPersistenceService implements UserPersistenceServiceInterface
 {
@@ -20,7 +22,8 @@ class UserPersistenceService implements UserPersistenceServiceInterface
 
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly MapperService $mapperService
+        private readonly MapperService $mapperService,
+        private readonly EventDispatcherInterface $eventDispatcher
     ){}
 
     /**
@@ -72,6 +75,9 @@ class UserPersistenceService implements UserPersistenceServiceInterface
     {
         $user = $this->mapperService->mapToEntity($userCreationDTO, User::class);
         $user->setRole($role);
+
+        $this->eventDispatcher->dispatch(new UserCreatedEvent($user), UserCreatedEvent::NAME);
+        $userDTO = $this->mapperService->mapToDTO($this->userRepository->save($user));
 
         return $this->mapperService->mapToDTO($this->userRepository->save($user));
     }

@@ -19,4 +19,12 @@ interface AuthorizationServiceInterface
      * @return void
      */
     public function denyAccessUnlessGranted(string $role): void;
+
+    /**
+     * Deny access if the user is not a member of the team
+     *
+     * @param int $teamId
+     * @return void
+     */
+    public function denyAccessUnlessMemberOfTeam(int $teamId): void;
 }

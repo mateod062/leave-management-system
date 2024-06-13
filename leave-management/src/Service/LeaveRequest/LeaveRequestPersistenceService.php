@@ -5,6 +5,7 @@ namespace App\Service\LeaveRequest;
 use App\Entity\LeaveRequest;
 use App\Entity\LeaveStatus;
 use App\Entity\UserRole;
+use App\Event\LeaveRequestApprovedEvent;
 use App\Repository\LeaveRequestRepository;
 use App\Service\Auth\AuthenticationService;
 use App\Service\DTO\LeaveRequestDTO;
@@ -15,6 +16,7 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use LogicException;
 use ReflectionException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceInterface
 {
@@ -22,7 +24,8 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
     public function __construct(
         private readonly LeaveRequestRepository $leaveRequestRepository,
         private readonly AuthenticationService  $authenticationService,
-        private readonly MapperService          $mapperService
+        private readonly MapperService          $mapperService,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {}
 
     /**
@@ -87,7 +90,18 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
             throw new LogicException('Leave request already approved by team leader');
         }
 
-        $leaveRequest->setTeamLeaderApproval(true);
+        if ($userRole == UserRole::ROLE_TEAM_LEAD->value) {
+            $leaveRequest->setTeamLeaderApproval(true);
+        }
+        elseif ($userRole == UserRole::ROLE_PROJECT_MANAGER->value) {
+            $leaveRequest->setProjectManagerApproval(true);
+        }
+
+        if ($leaveRequest->projectManagerApproved() && $leaveRequest->teamLeaderApproved()) {
+            $leaveRequest->setStatus(LeaveStatus::APPROVED);
+            $this->eventDispatcher->dispatch(new LeaveRequestApprovedEvent($leaveRequest), LeaveRequestApprovedEvent::NAME);
+        }
+
         $this->leaveRequestRepository->save($leaveRequest);
     }
 

@@ -7,12 +7,12 @@ use DateTime;
 class CommentDTO
 {
     public function __construct(
-        private ?int $id,
-        private int $userId,
-        private int $leaveRequestId,
-        private ?int $parentCommentId,
-        private string $comment,
-        private DateTime $createdAt,
+        private ?int $id = null,
+        private ?int $userId = null,
+        private ?int $leaveRequestId = null,
+        private ?int $parentCommentId = null,
+        private ?string $comment = null,
+        private ?DateTime $createdAt = null,
 
     ) {
         $this->createdAt = new DateTime();

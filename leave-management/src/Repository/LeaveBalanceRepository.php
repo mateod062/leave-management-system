@@ -37,4 +37,14 @@ class LeaveBalanceRepository extends ServiceEntityRepository
         $this->getEntityManager()->remove($leaveBalance);
         $this->getEntityManager()->flush();
     }
+
+    public function findAllWithUsersDistinct(): array
+    {
+        return $this->createQueryBuilder('lb')
+            ->select('DISTINCT u')
+            ->join('lb.user', 'u')
+            ->getQuery()
+            ->getResult();
+    }
+
 }

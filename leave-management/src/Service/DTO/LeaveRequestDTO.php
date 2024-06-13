@@ -7,15 +7,15 @@ use DateTime;
 class LeaveRequestDTO
 {
 public function __construct(
-        private ?int     $id,
-        private int      $userId,
-        private DateTime $startDate,
-        private DateTime $endDate,
-        private ?string  $reason,
-        private string   $status,
-        private bool     $teamLeaderApproval,
-        private bool     $projectManagerApproval,
-        private DateTime $createdAt,
+        private ?int     $id = null,
+        private ?int      $userId = null,
+        private ?DateTime $startDate = null,
+        private ?DateTime $endDate = null,
+        private ?string  $reason = null,
+        private ?string   $status = null,
+        private ?bool     $teamLeaderApproval = null,
+        private ?bool     $projectManagerApproval = null,
+        private ?DateTime $createdAt = null,
     ) {}
 
     public function getId(): ?int

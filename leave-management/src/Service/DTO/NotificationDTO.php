@@ -7,14 +7,12 @@ use DateTime;
 class NotificationDTO
 {
     public function __construct(
-        private string $message,
-        private int $userId,
-        private DateTime $createdAt
-    ) {
-        $this->createdAt = new DateTime();
-    }
+        private ?string $message = null,
+        private ?int $userId = null,
+        private ?DateTime $createdAt = null
+    ) {}
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
@@ -24,7 +22,7 @@ class NotificationDTO
         $this->createdAt = $createdAt;
     }
 
-    public function getMessage(): string
+    public function getMessage(): ?string
     {
         return $this->message;
     }
@@ -34,7 +32,7 @@ class NotificationDTO
         $this->message = $message;
     }
 
-    public function getUserId(): int
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
