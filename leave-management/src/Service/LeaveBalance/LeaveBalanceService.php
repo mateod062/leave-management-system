@@ -62,10 +62,12 @@ class LeaveBalanceService implements LeaveBalanceServiceInterface
      */
     public function resetLeaveBalances(): void
     {
-        $leaveBalances = $this->leaveBalanceRepository->findAllWithUsersDistinct();
+        $leaveBalances = $this->leaveBalanceRepository->findLastYearBalances();
 
         foreach ($leaveBalances as $leaveBalance) {
-            $this->initializeLeaveBalance(userId: $leaveBalance->getUser()->getId());
+            $unusedDays = $leaveBalance->getBalance();
+            $this->initializeLeaveBalance(userId: $leaveBalance->getUser()->getId(), bonus: $unusedDays);
+
         }
     }
 
@@ -74,7 +76,7 @@ class LeaveBalanceService implements LeaveBalanceServiceInterface
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function initializeLeaveBalance(int $userId): void
+    public function initializeLeaveBalance(int $userId, ?int $bonus = null): void
     {
         $leaveBalance = $this->leaveBalanceRepository->findOneBy(['user' => $userId]);
 
@@ -84,7 +86,7 @@ class LeaveBalanceService implements LeaveBalanceServiceInterface
 
         $leaveBalance = new LeaveBalanceInitializationDTO(
             userId: $userId,
-            balance: self::INITIAL_BALANCE
+            balance: self::INITIAL_BALANCE + $bonus ?? 0
         );
 
         $this->leaveBalanceRepository->save($this->mapperService->mapToEntity($leaveBalance));

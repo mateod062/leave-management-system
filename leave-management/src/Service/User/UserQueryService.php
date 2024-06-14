@@ -35,20 +35,6 @@ class UserQueryService implements UserQueryServiceInterface
     /**
      * @throws ReflectionException
      */
-    public function getTeamMembers(int $teamId): array
-    {
-        $users = $this->userRepository->findBy(['team' => $teamId]);
-
-        return array_map(function (User $user) {
-            $responseDTO = $this->mapperService->mapToDTO($user, UserResponseDTO::class);
-            $responseDTO->setLeaveBalance($this->leaveBalanceService->getLeaveBalance($user->getId()));
-            return $responseDTO;
-            }, $users);
-    }
-
-    /**
-     * @throws ReflectionException
-     */
     public function getUserById(int $id): UserDTO
     {
         $user = $this->userRepository->find($id);
@@ -57,7 +43,10 @@ class UserQueryService implements UserQueryServiceInterface
             throw new EntityNotFoundException(sprintf('%s with id %s not found', self::ENTITY_NAME, $id));
         }
 
-        return $this->mapperService->mapToDTO($user);
+        $userDTO = $this->mapperService->mapToDTO($user);
+        $userDTO->setLeaveBalance($this->leaveBalanceService->getLeaveBalance($id));
+
+        return $userDTO;
     }
 
     /**
@@ -71,6 +60,9 @@ class UserQueryService implements UserQueryServiceInterface
             throw new EntityNotFoundException(sprintf('%s with email %s not found', self::ENTITY_NAME, $email));
         }
 
-        return $this->mapperService->mapToDTO($user);
+        $userDTO = $this->mapperService->mapToDTO($user);
+        $userDTO->setLeaveBalance($this->leaveBalanceService->getLeaveBalance($userDTO->getId()));
+
+        return $userDTO;
     }
 }

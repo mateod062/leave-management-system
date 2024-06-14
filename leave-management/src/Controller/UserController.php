@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\UserRole;
 use App\Service\DTO\UserCreationDTO;
 use App\Service\DTO\UserDTO;
+use App\Service\Team\TeamService;
 use App\Service\User\UserPersistenceService;
 use App\Service\User\UserQueryService;
 use Doctrine\ORM\EntityNotFoundException;
@@ -21,7 +23,8 @@ class UserController extends AbstractController
 {
     public function __construct(
         private readonly UserQueryService $userQueryService,
-        private readonly UserPersistenceService $userPersistenceService
+        private readonly UserPersistenceService $userPersistenceService,
+        private readonly TeamService $teamService
     ) {}
 
     #[Route('/users', name: 'get_users', methods: ['GET'])]
@@ -40,7 +43,7 @@ class UserController extends AbstractController
     public function getTeamMembers(Request $request): JsonResponse
     {
         try {
-            return $this->json($this->userQueryService->getTeamMembers($request->attributes->get('teamId')));
+            return $this->json($this->teamService->getTeamMembers($request->attributes->get('teamId')));
         } catch (ReflectionException $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
@@ -85,10 +88,10 @@ class UserController extends AbstractController
 
         try {
             return match ($data['role']) {
-                'employee' => $this->json($this->userPersistenceService->createEmployee($user)),
-                'team_lead' => $this->json($this->userPersistenceService->createTeamLead($user)),
-                'project_manager' => $this->json($this->userPersistenceService->createProjectManager($user)),
-                'admin' => $this->json($this->userPersistenceService->createAdmin($user)),
+                UserRole::ROLE_EMPLOYEE->value => $this->json($this->userPersistenceService->createEmployee($user)),
+                UserRole::ROLE_TEAM_LEAD->value => $this->json($this->userPersistenceService->createTeamLead($user)),
+                UserRole::ROLE_PROJECT_MANAGER->value => $this->json($this->userPersistenceService->createProjectManager($user)),
+                UserRole::ROLE_ADMIN->value => $this->json($this->userPersistenceService->createAdmin($user)),
                 default => $this->json(['error' => 'Invalid role'], Response::HTTP_BAD_REQUEST)
             };
         } catch (ORMException | OptimisticLockException | ReflectionException $e) {

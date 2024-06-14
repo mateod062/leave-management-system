@@ -47,4 +47,15 @@ class LeaveBalanceRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findLastYearBalances(): array
+    {
+        $lastYear = (int) date('Y') - 1;
+
+        return $this->createQueryBuilder('lb')
+            ->andWhere('lb.year = :lastYear')
+            ->setParameter('lastYear', $lastYear)
+            ->groupBy('lb.user')
+            ->getQuery()
+            ->getResult();
+    }
 }

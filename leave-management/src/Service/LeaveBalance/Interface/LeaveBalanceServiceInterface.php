@@ -24,7 +24,7 @@ interface LeaveBalanceServiceInterface
     public function reduceLeaveBalance(int $userId, int $days): void;
 
     /**
-     * Reset leave balances for all users
+     * Reset leave balances for all users, adding unused leave days to the next year
      *
      * @return void
      */

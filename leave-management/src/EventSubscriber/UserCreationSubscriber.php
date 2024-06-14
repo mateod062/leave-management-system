@@ -1,6 +1,6 @@
 <?php
 
-namespace App\EventListener;
+namespace App\EventSubscriber;
 
 use App\Event\UserCreatedEvent;
 use App\Service\LeaveBalance\LeaveBalanceService;
@@ -9,7 +9,7 @@ use Doctrine\ORM\OptimisticLockException;
 use ReflectionException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class UserCreationListener implements EventSubscriberInterface
+class UserCreationSubscriber implements EventSubscriberInterface
 {
     public function __construct(private readonly LeaveBalanceService $leaveBalanceService)
     {}

@@ -8,6 +8,7 @@ use App\Event\UserCreatedEvent;
 use App\Repository\UserRepository;
 use App\Service\DTO\UserCreationDTO;
 use App\Service\DTO\UserDTO;
+use App\Service\LeaveBalance\LeaveBalanceService;
 use App\Service\Mapper\MapperService;
 use App\Service\User\Interface\UserPersistenceServiceInterface;
 use Doctrine\ORM\EntityNotFoundException;
@@ -23,6 +24,7 @@ class UserPersistenceService implements UserPersistenceServiceInterface
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly MapperService $mapperService,
+        private readonly LeaveBalanceService $leaveBalanceService,
         private readonly EventDispatcherInterface $eventDispatcher
     ){}
 
@@ -77,14 +79,13 @@ class UserPersistenceService implements UserPersistenceServiceInterface
         $user->setRole($role);
 
         $this->eventDispatcher->dispatch(new UserCreatedEvent($user), UserCreatedEvent::NAME);
-        $userDTO = $this->mapperService->mapToDTO($this->userRepository->save($user));
 
-        return $this->mapperService->mapToDTO($this->userRepository->save($user));
+        $userDTO = $this->mapperService->mapToDTO($this->userRepository->save($user));
+        $userDTO->setLeaveBalance($this->leaveBalanceService->getLeaveBalance($userDTO->getId()));
+
+        return $userDTO;
     }
 
-    /**
-     * @throws ReflectionException
-     */
     public function updateUser(int $id, UserDTO $userDTO): UserDTO
     {
         $user = $this->userRepository->find($id);
@@ -100,7 +101,9 @@ class UserPersistenceService implements UserPersistenceServiceInterface
 
         $this->userRepository->save($user);
 
-        return $this->mapperService->mapToDTO($user);
+        $userDTO->setLeaveBalance($this->leaveBalanceService->getLeaveBalance($id));
+
+        return $userDTO;
     }
 
     public function deleteUser(int $id): void

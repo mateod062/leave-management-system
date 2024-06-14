@@ -31,7 +31,7 @@ class LeaveRequestController extends AbstractController
         private AuthorizationService $authorizationService,
     ) {}
 
-    #[Route('/leave_requests', name: 'get_all_leave_requests', methods: ['GET'])]
+    #[Route('/leave-requests', name: 'get_all_leave_requests', methods: ['GET'])]
     public function getAllLeaveRequests(): JsonResponse
     {
         try {
@@ -41,7 +41,7 @@ class LeaveRequestController extends AbstractController
         }
     }
 
-    #[Route('/leave_requests/me', name: 'get_own_leave_requests', methods: ['GET'])]
+    #[Route('/leave-requests/me', name: 'get_own_leave_requests', methods: ['GET'])]
     public function getOwnLeaveRequests(): JsonResponse
     {
         try {
@@ -63,7 +63,7 @@ class LeaveRequestController extends AbstractController
         }
     }
 
-    #[Route('/leave_requests/{userId}', name: 'get_user_leave_requests', methods: ['GET'])]
+    #[Route('/leave-requests/{userId}', name: 'get_user_leave_requests', methods: ['GET'])]
     public function getUserLeaveRequests(Request $request): JsonResponse
     {
         try {
@@ -79,7 +79,7 @@ class LeaveRequestController extends AbstractController
         }
     }
 
-    #[Route('/leave_requests/team/{teamId}', name: 'get_team_calendar_of_leave_requests', methods: ['GET'])]
+    #[Route('/leave-requests/team/{teamId}', name: 'get_team_calendar_of_leave_requests', methods: ['GET'])]
     public function getTeamCalendar(Request $request): JsonResponse
     {
         try {
@@ -122,7 +122,7 @@ class LeaveRequestController extends AbstractController
         }
     }
 
-    #[Route('/leave_requests/approve/{id}', name: 'approve_leave_request', methods: ['PUT'])]
+    #[Route('/leave-requests/approve/{id}', name: 'approve_leave_request', methods: ['PUT'])]
     public function approveLeaveRequest(Request $request): JsonResponse
     {
         try {
@@ -144,7 +144,7 @@ class LeaveRequestController extends AbstractController
         }
     }
 
-    #[Route('/leave_requests/reject/{id}', name: 'reject_leave_request', methods: ['PUT'])]
+    #[Route('/leave-requests/reject/{id}', name: 'reject_leave_request', methods: ['PUT'])]
     public function rejectLeaveRequest(Request $request): JsonResponse
     {
         try {
@@ -166,7 +166,7 @@ class LeaveRequestController extends AbstractController
         }
     }
 
-    #[Route('/leave_requests/{id}', name: 'delete_leave_request', methods: ['DELETE'])]
+    #[Route('/leave-requests/{id}', name: 'delete_leave_request', methods: ['DELETE'])]
     public function deleteLeaveRequest(Request $request): JsonResponse
     {
         try {

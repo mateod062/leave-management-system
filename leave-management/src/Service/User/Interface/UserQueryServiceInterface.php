@@ -14,15 +14,6 @@ interface UserQueryServiceInterface
     public function getUsers(): array;
 
     /**
-     * Get all team members
-     *
-     * @param int $teamId
-     *
-     * @return array
-     */
-    public function getTeamMembers(int $teamId): array;
-
-    /**
      * Get user by id
      *
      * @param int $id

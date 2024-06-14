@@ -12,8 +12,19 @@ class UserDTO
         private ?string $username = null,
         private ?string $email = null,
         private ?string $password = null,
-        private ?string $role = null
+        private ?string $role = null,
+        private ?int $leaveBalance = null
     ) {}
+
+    public function getLeaveBalance(): ?int
+    {
+        return $this->leaveBalance;
+    }
+
+    public function setLeaveBalance(?int $leaveBalance): void
+    {
+        $this->leaveBalance = $leaveBalance;
+    }
 
     public function getId(): ?int
     {

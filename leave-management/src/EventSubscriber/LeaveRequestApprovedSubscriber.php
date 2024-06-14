@@ -1,12 +1,12 @@
 <?php
 
-namespace App\EventListener;
+namespace App\EventSubscriber;
 
 use App\Event\LeaveRequestApprovedEvent;
 use App\Service\LeaveBalance\LeaveBalanceService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LeaveRequestApprovedListener implements EventSubscriberInterface
+class LeaveRequestApprovedSubscriber implements EventSubscriberInterface
 {
     public function __construct(private readonly LeaveBalanceService $leaveBalanceService)
     {}
