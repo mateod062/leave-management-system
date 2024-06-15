@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\TeamCreationDTO;
+use App\Service\Team\Interface\TeamServiceInterface;
 use App\Service\Team\TeamService;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;
@@ -18,7 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class TeamController extends AbstractController
 {
     public function __construct(
-        private readonly TeamService $teamService
+        private readonly TeamServiceInterface $teamService
     )
     {}
 

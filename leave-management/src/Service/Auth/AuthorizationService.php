@@ -55,7 +55,7 @@ class AuthorizationService implements AuthorizationServiceInterface
      * @throws ORMException
      * @throws ReflectionException
      */
-    public function denyUnlessCommentOwner(int $commentId): void
+    public function denyUnlessCommentPoster(int $commentId): void
     {
         $comment = $this->commentService->getCommentById($commentId);
         $user = $this->mapperService->mapToEntity($this->authenticationService->getAuthenticatedUser());

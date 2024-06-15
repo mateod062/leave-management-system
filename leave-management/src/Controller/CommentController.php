@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\DTO\CommentDTO;
 use App\Service\Auth\AuthenticationService;
 use App\Service\Auth\AuthorizationService;
+use App\Service\Auth\Interface\AuthenticationServiceInterface;
+use App\Service\Auth\Interface\AuthorizationServiceInterface;
 use App\Service\Comment\CommentService;
+use App\Service\Comment\Interface\CommentServiceInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
@@ -20,9 +23,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class CommentController extends AbstractController
 {
     public function __construct(
-        private readonly CommentService $commentService,
-        private readonly AuthenticationService $authenticationService,
-        private readonly AuthorizationService $authorizationService
+        private readonly CommentServiceInterface $commentService,
+        private readonly AuthenticationServiceInterface $authenticationService,
+        private readonly AuthorizationServiceInterface $authorizationService
     ) {}
 
     #[Route(path: '/comments/{leaveRequestId}', name: 'get_comments', methods: ['GET'])]

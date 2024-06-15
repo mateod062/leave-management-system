@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\Notification\Interface\NotificationServiceInterface;
 use App\Service\Notification\NotificationService;
 use Doctrine\ORM\EntityNotFoundException;
 use Exception;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class NotificationController extends AbstractController
 {
     public function __construct(
-        private readonly NotificationService $notificationService,
+        private readonly NotificationServiceInterface $notificationService,
     ) {}
 
     #[Route('/notifications', name: 'get_notifications', methods: ['GET'])]

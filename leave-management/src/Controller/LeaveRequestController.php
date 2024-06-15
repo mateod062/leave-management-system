@@ -6,6 +6,10 @@ use App\DTO\LeaveRequestDTO;
 use App\DTO\LeaveRequestFilterDTO;
 use App\Service\Auth\AuthenticationService;
 use App\Service\Auth\AuthorizationService;
+use App\Service\Auth\Interface\AuthenticationServiceInterface;
+use App\Service\Auth\Interface\AuthorizationServiceInterface;
+use App\Service\LeaveRequest\Interface\LeaveRequestPersistenceServiceInterface;
+use App\Service\LeaveRequest\Interface\LeaveRequestQueryServiceInterface;
 use App\Service\LeaveRequest\LeaveRequestPersistenceService;
 use App\Service\LeaveRequest\LeaveRequestQueryService;
 use DateTime;
@@ -23,10 +27,10 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class LeaveRequestController extends AbstractController
 {
     public function __construct(
-        private LeaveRequestPersistenceService $leaveRequestPersistenceService,
-        private LeaveRequestQueryService $leaveRequestQueryService,
-        private AuthenticationService $authenticationService,
-        private AuthorizationService $authorizationService,
+        private LeaveRequestPersistenceServiceInterface $leaveRequestPersistenceService,
+        private LeaveRequestQueryServiceInterface $leaveRequestQueryService,
+        private AuthenticationServiceInterface $authenticationService,
+        private AuthorizationServiceInterface $authorizationService,
     ) {}
 
     #[Route('/leave-requests', name: 'get_all_leave_requests', methods: ['GET'])]

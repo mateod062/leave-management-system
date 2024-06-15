@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\DTO\UserCreationDTO;
 use App\DTO\UserDTO;
 use App\Entity\UserRole;
+use App\Service\Team\Interface\TeamServiceInterface;
 use App\Service\Team\TeamService;
+use App\Service\User\Interface\UserPersistenceServiceInterface;
+use App\Service\User\Interface\UserQueryServiceInterface;
 use App\Service\User\UserPersistenceService;
 use App\Service\User\UserQueryService;
 use Doctrine\ORM\EntityNotFoundException;
@@ -22,9 +25,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
     public function __construct(
-        private readonly UserQueryService $userQueryService,
-        private readonly UserPersistenceService $userPersistenceService,
-        private readonly TeamService $teamService
+        private readonly UserQueryServiceInterface $userQueryService,
+        private readonly UserPersistenceServiceInterface $userPersistenceService,
+        private readonly TeamServiceInterface $teamService
     ) {}
 
     #[Route('/users', name: 'get_users', methods: ['GET'])]

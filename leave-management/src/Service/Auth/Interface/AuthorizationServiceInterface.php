@@ -27,4 +27,12 @@ interface AuthorizationServiceInterface
      * @return void
      */
     public function denyAccessUnlessMemberOfTeam(int $teamId): void;
+
+    /**
+     * Deny access if the user is not the poster of the comment
+     *
+     * @param int $commentId
+     * @return void
+     */
+    public function denyUnlessCommentPoster(int $commentId): void;
 }

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Service\Auth\AuthenticationService;
+use App\Service\Auth\Interface\AuthenticationServiceInterface;
 use Exception;
 use ReflectionException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class AuthController extends AbstractController
 {
     private function __construct(
-        private readonly AuthenticationService $authenticationService
+        private readonly AuthenticationServiceInterface $authenticationService
     ) {}
 
     #[Route('/login', name: 'api_login', methods: ['POST'])]
