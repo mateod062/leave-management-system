@@ -2,8 +2,8 @@
 
 namespace App\Service\LeaveRequest\Interface;
 
-use App\Service\DTO\LeaveRequestCalendarDTO;
-use App\Service\DTO\LeaveRequestFilterDTO;
+use App\DTO\LeaveRequestCalendarDTO;
+use App\DTO\LeaveRequestFilterDTO;
 
 interface LeaveRequestQueryServiceInterface
 {

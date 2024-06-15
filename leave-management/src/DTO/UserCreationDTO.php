@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\DTO;
+namespace App\DTO;
 
 class UserCreationDTO
 {

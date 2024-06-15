@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\DTO\UserCreationDTO;
+use App\DTO\UserDTO;
 use App\Entity\UserRole;
-use App\Service\DTO\UserCreationDTO;
-use App\Service\DTO\UserDTO;
 use App\Service\Team\TeamService;
 use App\Service\User\UserPersistenceService;
 use App\Service\User\UserQueryService;

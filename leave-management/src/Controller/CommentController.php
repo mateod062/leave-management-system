@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
+use App\DTO\CommentDTO;
 use App\Service\Auth\AuthenticationService;
 use App\Service\Auth\AuthorizationService;
 use App\Service\Comment\CommentService;
-use App\Service\DTO\CommentDTO;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;

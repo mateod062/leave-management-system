@@ -2,11 +2,11 @@
 
 namespace App\Service\Notification;
 
+use App\DTO\NotificationDTO;
 use App\Entity\Notification;
 use App\Repository\NotificationRepository;
 use App\Service\Auth\AuthenticationService;
 use App\Service\Comment\CommentService;
-use App\Service\DTO\NotificationDTO;
 use App\Service\LeaveRequest\LeaveRequestQueryService;
 use App\Service\Mapper\MapperService;
 use App\Service\Notification\Interface\NotificationServiceInterface;

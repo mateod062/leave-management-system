@@ -2,11 +2,10 @@
 
 namespace App\Controller;
 
+use App\DTO\LeaveRequestDTO;
+use App\DTO\LeaveRequestFilterDTO;
 use App\Service\Auth\AuthenticationService;
 use App\Service\Auth\AuthorizationService;
-use App\Service\DTO\LeaveRequestDTO;
-use App\Service\DTO\LeaveRequestFilterDTO;
-use App\Service\LeaveBalance\LeaveBalanceService;
 use App\Service\LeaveRequest\LeaveRequestPersistenceService;
 use App\Service\LeaveRequest\LeaveRequestQueryService;
 use DateTime;
@@ -20,7 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 
 class LeaveRequestController extends AbstractController
 {

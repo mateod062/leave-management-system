@@ -2,7 +2,7 @@
 
 namespace App\Service\Notification\Interface;
 
-use App\Service\DTO\NotificationDTO;
+use App\DTO\NotificationDTO;
 
 interface NotificationServiceInterface
 {

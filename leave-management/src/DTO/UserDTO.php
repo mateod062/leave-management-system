@@ -1,9 +1,6 @@
 <?php
 
-namespace App\Service\DTO;
-
-use App\Entity\User;
-use App\Entity\UserRole;
+namespace App\DTO;
 
 class UserDTO
 {

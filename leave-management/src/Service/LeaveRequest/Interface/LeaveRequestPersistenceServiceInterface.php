@@ -2,7 +2,7 @@
 
 namespace App\Service\LeaveRequest\Interface;
 
-use App\Service\DTO\LeaveRequestDTO;
+use App\DTO\LeaveRequestDTO;
 
 interface LeaveRequestPersistenceServiceInterface
 {

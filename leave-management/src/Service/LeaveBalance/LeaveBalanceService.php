@@ -2,12 +2,10 @@
 
 namespace App\Service\LeaveBalance;
 
-use App\Entity\LeaveBalance;
+use App\DTO\LeaveBalanceInitializationDTO;
 use App\Repository\LeaveBalanceRepository;
-use App\Service\DTO\LeaveBalanceInitializationDTO;
 use App\Service\LeaveBalance\Interface\LeaveBalanceServiceInterface;
 use App\Service\Mapper\MapperService;
-use App\Service\User\UserQueryService;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;

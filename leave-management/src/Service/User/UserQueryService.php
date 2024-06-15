@@ -2,10 +2,9 @@
 
 namespace App\Service\User;
 
+use App\DTO\UserDTO;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\DTO\UserDTO;
-use App\Service\DTO\UserResponseDTO;
 use App\Service\LeaveBalance\LeaveBalanceService;
 use App\Service\Mapper\MapperService;
 use App\Service\User\Interface\UserQueryServiceInterface;

@@ -2,14 +2,14 @@
 
 namespace App\Service\Team;
 
+use App\DTO\TeamCreationDTO;
+use App\DTO\TeamResponseDTO;
+use App\DTO\UserResponseDTO;
 use App\Entity\Team;
 use App\Entity\User;
 use App\Entity\UserRole;
 use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
-use App\Service\DTO\TeamCreationDTO;
-use App\Service\DTO\TeamResponseDTO;
-use App\Service\DTO\UserResponseDTO;
 use App\Service\LeaveBalance\LeaveBalanceService;
 use App\Service\Mapper\MapperService;
 use Doctrine\ORM\EntityNotFoundException;

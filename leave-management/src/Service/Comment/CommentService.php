@@ -2,11 +2,11 @@
 
 namespace App\Service\Comment;
 
+use App\DTO\CommentDTO;
 use App\Event\CommentPostedEvent;
 use App\Event\CommentReplyEvent;
 use App\Repository\CommentRepository;
 use App\Service\Comment\Interface\CommentServiceInterface;
-use App\Service\DTO\CommentDTO;
 use App\Service\Mapper\MapperService;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;

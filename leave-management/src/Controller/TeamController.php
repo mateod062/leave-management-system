@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\DTO\TeamCreationDTO;
+use App\DTO\TeamCreationDTO;
 use App\Service\Team\TeamService;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;

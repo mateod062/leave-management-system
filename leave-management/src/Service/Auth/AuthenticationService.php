@@ -2,9 +2,9 @@
 
 namespace App\Service\Auth;
 
+use App\DTO\UserCreationDTO;
+use App\DTO\UserDTO;
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
-use App\Service\DTO\UserCreationDTO;
-use App\Service\DTO\UserDTO;
 use App\Service\User\UserPersistenceService;
 use App\Service\User\UserQueryService;
 use Doctrine\ORM\Exception\ORMException;

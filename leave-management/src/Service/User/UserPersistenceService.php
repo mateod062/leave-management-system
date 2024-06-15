@@ -2,12 +2,12 @@
 
 namespace App\Service\User;
 
+use App\DTO\UserCreationDTO;
+use App\DTO\UserDTO;
 use App\Entity\User;
 use App\Entity\UserRole;
 use App\Event\UserCreatedEvent;
 use App\Repository\UserRepository;
-use App\Service\DTO\UserCreationDTO;
-use App\Service\DTO\UserDTO;
 use App\Service\LeaveBalance\LeaveBalanceService;
 use App\Service\Mapper\MapperService;
 use App\Service\User\Interface\UserPersistenceServiceInterface;

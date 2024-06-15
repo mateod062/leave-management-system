@@ -2,7 +2,7 @@
 
 namespace App\Service\Auth\Interface;
 
-use App\Service\DTO\UserDTO;
+use App\DTO\UserDTO;
 
 interface AuthenticationServiceInterface
 {

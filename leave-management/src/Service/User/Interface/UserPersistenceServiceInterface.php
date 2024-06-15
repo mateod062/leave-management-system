@@ -2,9 +2,9 @@
 
 namespace App\Service\User\Interface;
 
+use App\DTO\UserCreationDTO;
+use App\DTO\UserDTO;
 use App\Entity\UserRole;
-use App\Service\DTO\UserCreationDTO;
-use App\Service\DTO\UserDTO;
 
 interface UserPersistenceServiceInterface
 {

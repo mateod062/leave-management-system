@@ -2,7 +2,7 @@
 
 namespace App\Service\LeaveRequest;
 
-use App\Entity\LeaveRequest;
+use App\DTO\LeaveRequestDTO;
 use App\Entity\LeaveStatus;
 use App\Entity\UserRole;
 use App\Event\LeaveRequestApprovedEvent;
@@ -10,7 +10,6 @@ use App\Event\LeaveRequestCreatedEvent;
 use App\Event\LeaveRequestRejectedEvent;
 use App\Repository\LeaveRequestRepository;
 use App\Service\Auth\AuthenticationService;
-use App\Service\DTO\LeaveRequestDTO;
 use App\Service\LeaveRequest\Interface\LeaveRequestPersistenceServiceInterface;
 use App\Service\Mapper\MapperService;
 use Doctrine\ORM\EntityNotFoundException;

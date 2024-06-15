@@ -2,7 +2,7 @@
 
 namespace App\Service\Comment\Interface;
 
-use App\Service\DTO\CommentDTO;
+use App\DTO\CommentDTO;
 
 interface CommentServiceInterface
 {
