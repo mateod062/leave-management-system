@@ -12,13 +12,14 @@ use App\Repository\TeamRepository;
 use App\Repository\UserRepository;
 use App\Service\LeaveBalance\LeaveBalanceService;
 use App\Service\Mapper\MapperService;
+use App\Service\Team\Interface\TeamServiceInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use LogicException;
 use ReflectionException;
 
-class TeamService
+class TeamService implements TeamServiceInterface
 {
     public function __construct(
         private readonly UserRepository $userRepository,
