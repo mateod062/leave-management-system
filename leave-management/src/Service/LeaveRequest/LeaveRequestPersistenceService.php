@@ -6,6 +6,8 @@ use App\Entity\LeaveRequest;
 use App\Entity\LeaveStatus;
 use App\Entity\UserRole;
 use App\Event\LeaveRequestApprovedEvent;
+use App\Event\LeaveRequestCreatedEvent;
+use App\Event\LeaveRequestRejectedEvent;
 use App\Repository\LeaveRequestRepository;
 use App\Service\Auth\AuthenticationService;
 use App\Service\DTO\LeaveRequestDTO;
@@ -38,6 +40,7 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
         $leaveRequestEntity = $this->mapperService->mapToEntity($leaveRequest);
 
         $this->leaveRequestRepository->save($leaveRequestEntity);
+        $this->eventDispatcher->dispatch(new LeaveRequestCreatedEvent($leaveRequestEntity), LeaveRequestCreatedEvent::NAME);
 
         return $this->mapperService->mapToDTO($leaveRequestEntity);
     }
@@ -131,7 +134,10 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
         }
 
         $leaveRequest->setStatus(LeaveStatus::REJECTED);
+
         $this->leaveRequestRepository->save($leaveRequest);
+
+        $this->eventDispatcher->dispatch(new LeaveRequestRejectedEvent($leaveRequest), LeaveRequestRejectedEvent::NAME);
     }
 
     /**

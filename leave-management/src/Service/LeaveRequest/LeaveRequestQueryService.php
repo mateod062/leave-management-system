@@ -5,10 +5,12 @@ namespace App\Service\LeaveRequest;
 use App\Repository\LeaveRequestRepository;
 use App\Service\DTO\LeaveRequestCalendarDTO;
 use App\Service\DTO\LeaveRequestDayDTO;
+use App\Service\DTO\LeaveRequestDTO;
 use App\Service\DTO\LeaveRequestFilterDTO;
 use App\Service\LeaveRequest\Interface\LeaveRequestQueryServiceInterface;
 use App\Service\Mapper\MapperService;
 use DateTime;
+use Doctrine\ORM\EntityNotFoundException;
 use ReflectionException;
 
 class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
@@ -43,6 +45,20 @@ class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
         }
 
         return new LeaveRequestCalendarDTO($startDate->format('F'), $year, $days);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function getLeaveRequestById(int $id): LeaveRequestDTO
+    {
+        $leaveRequest = $this->leaveRequestRepository->find($id);
+
+        if ($leaveRequest === null) {
+            throw new EntityNotFoundException(sprintf('%s with id %d not found', self::ENTITY_NAME, $id));
+        }
+
+        return $this->mapperService->mapToDTO($leaveRequest);
     }
 
     public function getLeaveRequests(LeaveRequestFilterDTO $filter): array

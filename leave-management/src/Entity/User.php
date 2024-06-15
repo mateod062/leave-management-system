@@ -33,12 +33,13 @@ class User
     private UserRole $role;
 
     #[ORM\OneToOne(targetEntity: Team::class, inversedBy: "teamLead")]
+    #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
     private Team $leadingTeam;
 
     #[ORM\OneToMany(targetEntity: Team::class, mappedBy: "projectManager")]
     private Collection $managedTeams;
 
-    #[ORM\OneToOne(targetEntity: Team::class, inversedBy: "members")]
+    #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: "members")]
     #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
     private ?Team $team;
 

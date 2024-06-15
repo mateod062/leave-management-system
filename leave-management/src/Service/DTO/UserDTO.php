@@ -13,8 +13,19 @@ class UserDTO
         private ?string $email = null,
         private ?string $password = null,
         private ?string $role = null,
+        private ?int $teamId = null,
         private ?int $leaveBalance = null
     ) {}
+
+    public function getTeamId(): ?int
+    {
+        return $this->teamId;
+    }
+
+    public function setTeamId(?int $teamId): void
+    {
+        $this->teamId = $teamId;
+    }
 
     public function getLeaveBalance(): ?int
     {

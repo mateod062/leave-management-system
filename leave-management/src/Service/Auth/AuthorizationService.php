@@ -3,6 +3,7 @@
 namespace App\Service\Auth;
 
 use App\Service\Auth\Interface\AuthorizationServiceInterface;
+use App\Service\Comment\CommentService;
 use App\Service\Mapper\MapperService;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
@@ -15,6 +16,7 @@ class AuthorizationService implements AuthorizationServiceInterface
     public function __construct(
         private readonly AuthorizationCheckerInterface $authorizationChecker,
         private readonly AuthenticationService $authenticationService,
+        private readonly CommentService $commentService,
         private readonly MapperService $mapperService
     ) {}
 
@@ -45,6 +47,25 @@ class AuthorizationService implements AuthorizationServiceInterface
 
         if ($user->getTeam()->getId() !== $teamId) {
             throw new AccessDeniedHttpException('User not a member of the team');
+        }
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws ReflectionException
+     */
+    public function denyUnlessCommentOwner(int $commentId): void
+    {
+        $comment = $this->commentService->getCommentById($commentId);
+        $user = $this->mapperService->mapToEntity($this->authenticationService->getAuthenticatedUser());
+
+        if (!$user) {
+            throw new AccessDeniedHttpException('User not authenticated');
+        }
+
+        if ($comment->getUserId() !== $user->getId()) {
+            throw new AccessDeniedHttpException('User not the owner of the comment');
         }
     }
 }

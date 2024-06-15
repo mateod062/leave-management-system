@@ -22,9 +22,22 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\EventListener\LeaveRequestApprovedListener:
+    App\EventSubscriber\LeaveRequestApprovedSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
-    App\EventListener\UserCreationListener:
+    App\EventSubscriber\LeaveRequestRejectedSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+    App\EventSubscriber\UserCreationListener:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+    App\EventSubscriber\LeaveRequestCreatedListener:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+    App\EventSubscriber\CommentCreatedSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+
+    App\EventSubscriber\CommentReplySubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
