@@ -15,6 +15,14 @@ interface CommentServiceInterface
     public function getComments(int $leaveRequestId): array;
 
     /**
+     * Get all replies for a comment
+     *
+     * @param int $commentId
+     * @return array
+     */
+    public function getReplies(int $commentId): array;
+
+    /**
      * Add a new comment
      *
      * @param CommentDTO $comment

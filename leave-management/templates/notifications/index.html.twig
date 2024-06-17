@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notification Center</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+</head>
+<body>
+<div class="notification-center">
+    <h1>Notifications</h1>
+    {% for notification in notifications %}
+        <div class="notification">
+            <span>{{ notification.date|date('d/m/Y H:i') }}</span>
+            <p>{{ notification.message }}</p>
+        </div>
+    {% endfor %}
+</div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ asset('css/sytle.css') }}">
+</head>
+<body>
+    <div class="employee-dashboard">
+        <div class="navigation">
+            <a href="#send_leave_request">Request Leave</a>
+            <a href="#pending_leave_requests">Leave Requests</a>
+            <a href="{{ path('notifications') }}">Notifications</a>
+            <a href="{{ path('leave_history') }}">Leave History</a>
+            <a href="{{ path('team_calendar', {'teamId': user.teamId}) }}">Team Calendar</a>
+            <a href="{{ path('logout') }}">Logout</a>
+        </div>
+        <div class="leave-balance">
+            <h2>Leave Balance: {{ user.leaveBalance }} {% if user.leaveBalance != 1 'days' else 'day' %}</h2>
+        </div>
+        <div class="leave-requests" id="pending_leave_requests">
+            <h2>Pending Leave Requests</h2>
+            {% for leave_request in leave_requests %}
+                <div class="leave-request">
+                    <span>{{ leave_request.startDate|date('d/m/Y') }} - {{ leave_request.endDate|date('d/m/Y') }}</span>
+                    <a href="{{ path('leave_request_details', {'id': leave_request.id}) }}">Details</a>
+                </div>
+            {% endfor %}
+        </div>
+        <div id="send_leave_request">
+            {% include 'create.html.twig' %}
+        </div>
+    </div>
+</body>
+</html>

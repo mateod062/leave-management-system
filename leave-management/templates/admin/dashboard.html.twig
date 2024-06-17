@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ asset('css/sytle.css') }}">
+</head>
+<body>
+    <div class="admin-dashboard">
+        <div class="navigation">
+            <a href="#users">View Users</a>
+            <a href="{{ path('create_user') }}">Leaves</a>
+            <a href="#leave_requests">View All Leave Requests</a>
+            <a href="{{ path('logout') }}">Logout</a>
+        </div>
+        <div class="users" id="users">
+            <h2>Users</h2>
+            {% for user in users %}
+                <div class="user">
+                    <span>{{ user.username }}</span>
+                    <p>{{ user.role }}</p>
+                    <a href="{{ path('update_user', {'id': user.id}) }}">Edit</a>
+                    <a href="{{ path('delete_user', {'id': user.id}) }}">Delete</a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="leave-requests" id="leave_requests">
+            <h2>Leave Requests</h2>
+            {% for leave_request in leave_requests %}
+                <div class="leave-request">
+                    <span>{{ leave_request.user.username }} | {{ leave_request.startDate|date('d/m/Y') }} - {{ leave_request.endDate|date('d/m/Y') }}</span>
+                    <a href="{{ path('leave_request_details', {'id': leave_request.id}) }}">Details</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

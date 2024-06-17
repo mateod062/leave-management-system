@@ -7,6 +7,13 @@ use App\DTO\NotificationDTO;
 interface NotificationServiceInterface
 {
     /**
+     * Get all notifications for the authenticated user
+     *
+     * @return array
+     */
+    public function getUserNotifications(): array;
+
+    /**
      * Send a notification to a user
      *
      * @param NotificationDTO $notificationDTO

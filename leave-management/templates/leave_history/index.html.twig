@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Leave History</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+</head>
+<body>
+<div class="leave-history">
+    <h1>Leave History</h1>
+    {% for leave_request in leave_requests %}
+        <div class="leave-request">
+            <span>{{ leave_request.startDate|date('d/m/Y') }} - {{ leave_request.endDate|date('d/m/Y') }}</span>
+            <a href="{{ path('leave_request_details', {'id': leave_request.id}) }}">Details</a>
+        </div>
+    {% endfor %}
+</div>
+</body>
+</html>

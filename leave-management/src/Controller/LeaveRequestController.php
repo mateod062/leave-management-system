@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\LeaveRequestDTO;
 use App\DTO\LeaveRequestFilterDTO;
+use App\Form\LeaveRequestCreationType;
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
 use App\Service\Auth\Interface\AuthorizationServiceInterface;
 use App\Service\LeaveRequest\Interface\LeaveRequestPersistenceServiceInterface;
@@ -23,10 +24,10 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class LeaveRequestController extends AbstractController
 {
     public function __construct(
-        private LeaveRequestPersistenceServiceInterface $leaveRequestPersistenceService,
-        private LeaveRequestQueryServiceInterface $leaveRequestQueryService,
-        private AuthenticationServiceInterface $authenticationService,
-        private AuthorizationServiceInterface $authorizationService,
+        private readonly LeaveRequestPersistenceServiceInterface $leaveRequestPersistenceService,
+        private readonly LeaveRequestQueryServiceInterface       $leaveRequestQueryService,
+        private readonly AuthenticationServiceInterface          $authenticationService,
+        private readonly AuthorizationServiceInterface           $authorizationService,
     ) {}
 
     #[Route('/leave-requests', name: 'get_all_leave_requests', methods: ['GET'])]
@@ -97,27 +98,40 @@ class LeaveRequestController extends AbstractController
         }
     }
 
-    public function createLeaveRequest(Request $request): JsonResponse
+    #[Route('/leave-requests', name: 'create_leave_request', methods: ['POST'])]
+    public function createLeaveRequest(Request $request): Response
     {
-        try {
-            $data = json_decode($request->getContent(), true);
+        $form = $this->createForm(LeaveRequestCreationType::class);
 
-            $user = $this->authenticationService->getAuthenticatedUser();
-            $leaveRequest = $this->leaveRequestPersistenceService->createLeaveRequest(
-                new LeaveRequestDTO(
-                    userId: $user->getId(),
-                    startDate: new DateTime($data['startDate']),
-                    endDate: new DateTime($data['endDate']),
-                    reason: $data['reason']
-                )
-            );
+        $form->handleRequest($request);
 
-            return $this->json($leaveRequest);
-        } catch (ReflectionException | ORMException $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
-        } catch (Exception $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        if ($form->isSubmitted() && !$form->isValid()) {
+            return $this->json($form->getErrors(), Response::HTTP_BAD_REQUEST);
         }
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            try {
+                $user = $this->authenticationService->getAuthenticatedUser();
+                $leaveRequest = $this->leaveRequestPersistenceService->createLeaveRequest(
+                    new LeaveRequestDTO(
+                        userId: $user->getId(),
+                        startDate: new DateTime($data['startDate']),
+                        endDate: new DateTime($data['endDate']),
+                        reason: $data['reason']
+                    )
+                );
+
+                return $this->json($leaveRequest);
+            } catch (ReflectionException | ORMException $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            } catch (Exception $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return $this->render('leave_request/create.html.twig', ['form' => $form->createView()]);
     }
 
     #[Route('/leave-requests/approve/{id}', name: 'approve_leave_request', methods: ['PUT'])]

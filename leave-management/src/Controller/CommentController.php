@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\CommentDTO;
+use App\Form\PostCommentType;
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
 use App\Service\Auth\Interface\AuthorizationServiceInterface;
 use App\Service\Comment\Interface\CommentServiceInterface;
@@ -32,28 +33,42 @@ class CommentController extends AbstractController
     }
 
     #[Route(path: '/comments/{leaveRequestId}', name: 'post_comment', methods: ['POST'])]
-    public function postComment(Request $request): JsonResponse
+    public function postComment(Request $request): Response
     {
-        $data = json_decode($request->getContent(), true);
+        $form = $this->createForm(PostCommentType::class);
 
-        try {
-            $comment = $this->commentService->addComment(new CommentDTO(
-                userId: $this->authenticationService->getAuthenticatedUser()->getId(),
-                leaveRequestId: $request->attributes->get('leaveRequestId'),
-                comment: $data['comment']
-            ));
+        $form->handleRequest($request);
 
-            return $this->json($comment);
-        } catch (OptimisticLockException|ReflectionException $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
-        } catch (ORMException $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
-        } catch (Exception $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        if ($form->isSubmitted() && !$form->isValid()) {
+            return $this->json($form->getErrors(), Response::HTTP_BAD_REQUEST);
         }
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            try {
+                $comment = $this->commentService->addComment(new CommentDTO(
+                    userId: $this->authenticationService->getAuthenticatedUser()->getId(),
+                    leaveRequestId: $request->attributes->get('leaveRequestId'),
+                    comment: $data['comment']
+                ));
+
+                $this->commentService->addComment($comment);
+            } catch (OptimisticLockException|ReflectionException $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            } catch (EntityNotFoundException $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
+            } catch (Exception $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return $this->render('comment/create.html.twig', [
+            'form' => $form->createView()
+        ]);
     }
 
-    #[Route(path: '/comments/reply/{parentCommentId}', name: 'update_comment', methods: ['PUT'])]
+    #[Route(path: '/comments/reply/{parentCommentId}', name: 'reply_comment', methods: ['PUT'])]
     public function reply(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);

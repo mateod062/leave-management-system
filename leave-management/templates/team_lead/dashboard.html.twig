@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ asset('css/sytle.css') }}">
+</head>
+<body>
+    <div class="team-lead-dashboard">
+        <div class="navigation">
+            <a href="#pending_leave_requests">Leave Requests</a>
+            <a href="{{ path('notifications') }}">Notifications</a>
+            <a href="{{ path('leave_history') }}">Leave History</a>
+            <a href="{{ path('team_calendar') }}">Team Calendar</a>
+            <a href="#approve_leave_requests">Approve Requests</a>
+            <a href="{{ path('logout') }}">Logout</a>
+        </div>
+        <div class="leave-balance">
+            <h2>Leave Balance: {{ user.leaveBalance }} {%if user.leaveBalance != 1 'days' else 'day' %}</h2>
+        </div>
+        <div class="leave-requests" id="pending_leave_requests">
+            <h2>My Pending Leave Requests</h2>
+            {% for request in my_requests %}
+                <div class="leave-request">
+                    <span>{{ request.startDate|date('d/m/Y') }} - {{ request.endDate|date('d/m/Y') }}</span>
+                    <a href="{{ path('leave_request_details', {'id': request.id}) }}">Details</a>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="leave-requests" id="approve_leave_requests">
+            <h2>Leave Requests</h2>
+            {% for request in requests %}
+                <div class="leave-request">
+                    <span>{{ request.user.username }} | {{ request.startDate|date('d/m/Y') }} - {{ request.endDate|date('d/m/Y') }}</span>
+                    <a href="{{ path('approve_leave_request', {'id': request.id}) }}">Approve</a>
+                    <a href="{{ path('reject_leave_request', {'id': request.id}) }}">Reject</a>
+                    <a href="{{ path('leave_request_details', {'id': request.id}) }}">Details</a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="team-members">
+            <h2>Team Members</h2>
+            {% for member in team_members %}
+                <div class="team-member">
+                    <span>{{ member.username }} Leave Balance: {{ member.leaveBalance }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="send-leave-request" id="request_leave">
+            <h2>Send Leave Request</h2>
+            <form action="{{ path('request_leave') }}" method="post">
+                <label for="start_date">Start Date</label>
+                <input type="date" name="_start_date" id="start_date" required>
+
+                <label for="end_date">End Date</label>
+                <input type="date" name="_end_date" id="end_date" required>
+
+                <label for="reason">Reason</label>
+                <textarea name="_reason" id="reason"></textarea>
+
+                <button type="submit">Send Request</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

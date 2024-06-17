@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Leave Request</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+</head>
+<body>
+<div class="leave-request-details">
+    <h1>Leave Request</h1>
+    <p>Start date: {{ leave_request.startDate|date('d/m/Y') }}</p>
+    <p>End date: {{ leave_request.endDate|date('d/m/Y') }}</p>
+    <p>Reason: {{ leave_request.reason }}</p>
+    <p>User: {{ leave_request.user.username }}</p>
+    <p>Status: {{ leave_request.status }}</p>
+
+    <div class="comments">
+        <h2>Comments</h2>
+        {% for comment in comments %}
+            {% if comment.parentCommentId is null %}
+                <div class="comment">
+                    <p>{{ comment.comment }}</p>
+                    <span>{{ comment.user.username }}</span>
+                    {# TODO #}
+                    <a>Reply</a>
+                </div>
+                {% for reply in comment.replies %}
+                    <div class="reply">
+                        <p>{{ reply.comment }}</p>
+                        <span>{{ reply.user.username }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    {% include 'comment/create.html.twig' %}
+</div>
+</body>
+</html>

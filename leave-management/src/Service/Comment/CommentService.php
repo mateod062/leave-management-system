@@ -86,4 +86,9 @@ class CommentService implements CommentServiceInterface
         }
         $this->commentRepository->delete($comment);
     }
+
+    public function getReplies(int $commentId): array
+    {
+        return $this->commentRepository->findBy(['parentCommentId' => $commentId]);
+    }
 }

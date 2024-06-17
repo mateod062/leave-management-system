@@ -5,6 +5,10 @@ namespace App\Controller;
 use App\DTO\UserCreationDTO;
 use App\DTO\UserDTO;
 use App\Entity\UserRole;
+use App\Form\UserType;
+use App\Service\Auth\AuthenticationService;
+use App\Service\Auth\Interface\AuthenticationServiceInterface;
+use App\Service\Mapper\MapperService;
 use App\Service\Team\Interface\TeamServiceInterface;
 use App\Service\User\Interface\UserPersistenceServiceInterface;
 use App\Service\User\Interface\UserQueryServiceInterface;
@@ -24,6 +28,8 @@ class UserController extends AbstractController
     public function __construct(
         private readonly UserQueryServiceInterface $userQueryService,
         private readonly UserPersistenceServiceInterface $userPersistenceService,
+        private readonly AuthenticationServiceInterface $authenticationService,
+        private readonly MapperService $mapperService,
         private readonly TeamServiceInterface $teamService
     ) {}
 
@@ -80,44 +86,95 @@ class UserController extends AbstractController
     }
 
     #[Route('/users', name: 'create_user', methods: ['POST'])]
-    public function createUser(Request $request): JsonResponse
+    public function createUser(Request $request): Response
     {
-        $data = json_decode($request->getContent(), true);
+        $form = $this->createForm(UserType::class);
 
-        $user = new UserCreationDTO($data['username'], $data['email'], $data['password']);
+        $form->handleRequest($request);
 
-        try {
-            return match ($data['role']) {
-                UserRole::ROLE_EMPLOYEE->value => $this->json($this->userPersistenceService->createEmployee($user)),
-                UserRole::ROLE_TEAM_LEAD->value => $this->json($this->userPersistenceService->createTeamLead($user)),
-                UserRole::ROLE_PROJECT_MANAGER->value => $this->json($this->userPersistenceService->createProjectManager($user)),
-                UserRole::ROLE_ADMIN->value => $this->json($this->userPersistenceService->createAdmin($user)),
-                default => $this->json(['error' => 'Invalid role'], Response::HTTP_BAD_REQUEST)
-            };
-        } catch (ORMException | OptimisticLockException | ReflectionException $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
-        } catch (Exception $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        if ($form->isSubmitted() && !$form->isValid()) {
+            return $this->json($form->getErrors(true), Response::HTTP_BAD_REQUEST);
         }
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            $user = new UserCreationDTO($data['username'], $data['email'], $data['password']);
+
+            try {
+                switch ($data['role']) {
+                    case UserRole::ROLE_EMPLOYEE->value:
+                        $this->json($this->userPersistenceService->createEmployee($user));
+                        break;
+                    case UserRole::ROLE_TEAM_LEAD->value:
+                        $this->json($this->userPersistenceService->createTeamLead($user));
+                        break;
+                    case UserRole::ROLE_PROJECT_MANAGER->value:
+                        $this->json($this->userPersistenceService->createProjectManager($user));
+                        break;
+                    case UserRole::ROLE_ADMIN->value:
+                        $this->json($this->userPersistenceService->createAdmin($user));
+                        break;
+                    default:
+                        $this->json(['error' => 'Invalid role'], Response::HTTP_BAD_REQUEST);
+                }
+
+                return $this->redirectToRoute('admin/dashboard.html.twig',[
+                    'id' => $this->authenticationService->getAuthenticatedUser()->getId()
+                ]);
+            } catch (Exception $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return $this->render('admin/add_user.html.twig', ['form' => $form->createView()]);
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ReflectionException
+     * @throws ORMException
+     */
     #[Route('/users/{id}', name: 'update_user', methods: ['PUT'])]
-    public function updateUser(Request $request): JsonResponse
+    public function updateUser(Request $request): Response
     {
-        $data = json_decode($request->getContent(), true);
         $userId = $request->attributes->get('id');
+        $user = $this->userQueryService->getUserById($userId);
 
-        $userDTO = new UserDTO($userId, $data['username'], $data['email'], $data['password'], $data['role']);
+        $form = $this->createForm(UserType::class, [
+            'username' => $user->getUsername(),
+            'email' => $user->getEmail(),
+            'role' => $user->getRole(),
+            'team' => $this->mapperService->mapToEntity($user)->getTeam()
+        ]);
 
-        try {
-            return $this->json($this->userPersistenceService->updateUser($data['id'], $userDTO));
-        } catch (EntityNotFoundException $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
-        } catch (ReflectionException $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
-        } catch (Exception $e) {
-            return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            return $this->json($form->getErrors(true), Response::HTTP_BAD_REQUEST);
         }
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            $userDTO = new UserDTO($userId, $data['username'], $data['email'], $data['password'], $data['role']);
+
+            try {
+                $this->json($this->userPersistenceService->updateUser($data['id'], $userDTO));
+
+                return $this->redirectToRoute('admin/dashboard.html.twig',[
+                    'id' => $this->authenticationService->getAuthenticatedUser()->getId()
+                ]);
+            } catch (EntityNotFoundException $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
+            } catch (ReflectionException $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            } catch (Exception $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return $this->render('admin/edit_user.html.twig', ['form' => $form->createView()]);
     }
 
     #[Route('/users/{id}', name: 'delete_user', methods: ['DELETE'])]
