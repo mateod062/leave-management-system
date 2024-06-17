@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\NotificationRepository;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -28,12 +29,12 @@ class Notification
     private bool $isRead = false;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTime $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct()
     {
         $this->isRead = false;
-        $this->createdAt = new DateTime();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getUser(): User
@@ -66,12 +67,12 @@ class Notification
         $this->isRead = $isRead;
     }
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTime $createdAt): void
+    public function setCreatedAt(DateTimeImmutable $createdAt): void
     {
         $this->createdAt = $createdAt;
     }

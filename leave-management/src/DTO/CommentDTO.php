@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-use DateTime;
+use DateTimeImmutable;
 
 class CommentDTO
 {
@@ -12,11 +12,9 @@ class CommentDTO
         private ?int $leaveRequestId = null,
         private ?int $parentCommentId = null,
         private ?string $comment = null,
-        private ?DateTime $createdAt = null,
+        private DateTimeImmutable $createdAt = new DateTimeImmutable(),
 
-    ) {
-        $this->createdAt = new DateTime();
-    }
+    ) {}
 
     public function getId(): ?int
     {
@@ -68,12 +66,12 @@ class CommentDTO
         $this->comment = $comment;
     }
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTime $createdAt): void
+    public function setCreatedAt(DateTimeImmutable $createdAt): void
     {
         $this->createdAt = $createdAt;
     }

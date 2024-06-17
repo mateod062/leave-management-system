@@ -3,11 +3,8 @@
 namespace App\Controller;
 
 use App\DTO\CommentDTO;
-use App\Service\Auth\AuthenticationService;
-use App\Service\Auth\AuthorizationService;
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
 use App\Service\Auth\Interface\AuthorizationServiceInterface;
-use App\Service\Comment\CommentService;
 use App\Service\Comment\Interface\CommentServiceInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;

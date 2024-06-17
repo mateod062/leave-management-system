@@ -26,7 +26,7 @@ class MapperService implements MapperServiceInterface
     {
         if ($dtoClass === null) {
             $className = (new ReflectionClass($entity))->getShortName();
-            $dtoClass = 'App\\Service\\DTO\\' . $className . 'DTO';
+            $dtoClass = 'App\\DTO\\' . $className . 'DTO';
         }
         
         $dto = new $dtoClass();
@@ -62,7 +62,7 @@ class MapperService implements MapperServiceInterface
     {
         if ($entityClass === null) {
             $className = str_replace('DTO', '', (new ReflectionClass($dto))->getShortName());
-            $entityClass = '\\App\\Entity\\' . $className;
+            $entityClass = 'App\\Entity\\' . $className;
         }
 
         $entity = new $entityClass();

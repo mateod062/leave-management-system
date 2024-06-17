@@ -22,7 +22,7 @@ interface TeamServiceInterface
      *
      * @param int $teamId
      *
-     * @return UserResponseDTO
+     * @return \App\DTO\UserResponseDTO
      */
     public function getProjectManager(int $teamId): UserResponseDTO;
 

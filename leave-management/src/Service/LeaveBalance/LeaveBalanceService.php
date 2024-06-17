@@ -3,6 +3,7 @@
 namespace App\Service\LeaveBalance;
 
 use App\DTO\LeaveBalanceInitializationDTO;
+use App\Entity\LeaveBalance;
 use App\Repository\LeaveBalanceRepository;
 use App\Service\LeaveBalance\Interface\LeaveBalanceServiceInterface;
 use App\Service\Mapper\MapperService;
@@ -76,7 +77,10 @@ class LeaveBalanceService implements LeaveBalanceServiceInterface
      */
     public function initializeLeaveBalance(int $userId, ?int $bonus = null): void
     {
-        $leaveBalance = $this->leaveBalanceRepository->findOneBy(['user' => $userId]);
+        $leaveBalance = $this->leaveBalanceRepository->findOneBy([
+            'user' => $userId,
+            'year' => (int) date('Y')
+            ]);
 
         if ($leaveBalance) {
             throw new LogicException(sprintf('%s for user with id %s already exists', self::ENTITY_NAME, $userId));
@@ -87,6 +91,6 @@ class LeaveBalanceService implements LeaveBalanceServiceInterface
             balance: self::INITIAL_BALANCE + $bonus ?? 0
         );
 
-        $this->leaveBalanceRepository->save($this->mapperService->mapToEntity($leaveBalance));
+        $this->leaveBalanceRepository->save($this->mapperService->mapToEntity($leaveBalance, LeaveBalance::class));
     }
 }

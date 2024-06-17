@@ -78,9 +78,10 @@ class UserPersistenceService implements UserPersistenceServiceInterface
         $user = $this->mapperService->mapToEntity($userCreationDTO, User::class);
         $user->setRole($role);
 
+        $userDTO = $this->mapperService->mapToDTO($this->userRepository->save($user));
+
         $this->eventDispatcher->dispatch(new UserCreatedEvent($user), UserCreatedEvent::NAME);
 
-        $userDTO = $this->mapperService->mapToDTO($this->userRepository->save($user));
         $userDTO->setLeaveBalance($this->leaveBalanceService->getLeaveBalance($userDTO->getId()));
 
         return $userDTO;

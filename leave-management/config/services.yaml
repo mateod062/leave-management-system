@@ -28,13 +28,13 @@ services:
     App\EventSubscriber\LeaveRequestRejectedSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
-    App\EventSubscriber\UserCreationListener:
+    App\EventSubscriber\UserCreationSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
-    App\EventSubscriber\LeaveRequestCreatedListener:
+    App\EventSubscriber\LeaveRequestCreatedSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
-    App\EventSubscriber\CommentCreatedSubscriber:
+    App\EventSubscriber\CommentPostedSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
 

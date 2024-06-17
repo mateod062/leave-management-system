@@ -4,14 +4,10 @@ namespace App\Controller;
 
 use App\DTO\LeaveRequestDTO;
 use App\DTO\LeaveRequestFilterDTO;
-use App\Service\Auth\AuthenticationService;
-use App\Service\Auth\AuthorizationService;
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
 use App\Service\Auth\Interface\AuthorizationServiceInterface;
 use App\Service\LeaveRequest\Interface\LeaveRequestPersistenceServiceInterface;
 use App\Service\LeaveRequest\Interface\LeaveRequestQueryServiceInterface;
-use App\Service\LeaveRequest\LeaveRequestPersistenceService;
-use App\Service\LeaveRequest\LeaveRequestQueryService;
 use DateTime;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;

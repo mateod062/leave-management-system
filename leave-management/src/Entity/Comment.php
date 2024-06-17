@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CommentRepository;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -31,11 +32,16 @@ class Comment
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
     #[NotBlank]
-    private DateTime $createdAt;
+    private DateTimeImmutable $createdAt;
 
     #[ORM\ManyToOne(targetEntity: Comment::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
     private Comment $parentComment;
+
+    public function __construct()
+    {
+        $this->createdAt = new DateTimeImmutable();
+    }
 
     public function getUser(): User
     {
@@ -67,12 +73,12 @@ class Comment
         $this->comment = $comment;
     }
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTime $createdAt): void
+    public function setCreatedAt(DateTimeImmutable $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
@@ -85,11 +91,6 @@ class Comment
     public function setParentComment(Comment $parentComment): void
     {
         $this->parentComment = $parentComment;
-    }
-
-    public function __construct()
-    {
-        $this->createdAt = new DateTime();
     }
 
     public function getId(): ?int

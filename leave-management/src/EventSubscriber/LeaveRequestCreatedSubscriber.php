@@ -30,6 +30,7 @@ class LeaveRequestCreatedSubscriber implements EventSubscriberInterface
      */
     public function onLeaveRequestCreated(LeaveRequestCreatedEvent $event): void
     {
-        $this->notificationService->notifyLeaveRequestCreated($event->getLeaveRequest()->getId());
+        $leaveRequest = $event->getLeaveRequest();
+        $this->notificationService->notifyLeaveRequestCreated($leaveRequest->getId());
     }
 }

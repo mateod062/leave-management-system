@@ -10,7 +10,7 @@ use App\Service\User\UserQueryService;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use ReflectionException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 
@@ -19,7 +19,7 @@ class AuthenticationService implements AuthenticationServiceInterface
     public function __construct(
         private readonly UserQueryService       $userFetchService,
         private readonly UserPersistenceService $userPersistenceService,
-        private readonly UserPasswordHasher     $passwordHasher,
+        private readonly UserPasswordHasherInterface     $passwordHasher,
         private readonly Security               $security
     ) {}
 

@@ -38,7 +38,7 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
     {
         $leaveRequestEntity = $this->mapperService->mapToEntity($leaveRequest);
 
-        $this->leaveRequestRepository->save($leaveRequestEntity);
+        $leaveRequestEntity = $this->leaveRequestRepository->save($leaveRequestEntity);
         $this->eventDispatcher->dispatch(new LeaveRequestCreatedEvent($leaveRequestEntity), LeaveRequestCreatedEvent::NAME);
 
         return $this->mapperService->mapToDTO($leaveRequestEntity);
@@ -58,7 +58,7 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
         $leaveRequest->setStartDate($leaveRequestDTO->getStartDate());
         $leaveRequest->setEndDate($leaveRequestDTO->getEndDate());
         $leaveRequest->setReason($leaveRequestDTO->getReason());
-        $leaveRequest->setStatus(LeaveStatus::tryFrom($leaveRequestDTO->getStatus()));
+        $leaveRequest->setStatus($leaveRequestDTO->getStatus());
         $leaveRequest->setTeamLeaderApproval($leaveRequestDTO->teamLeadApproved());
         $leaveRequest->setProjectManagerApproval($leaveRequestDTO->projectManagerApproved());
         $leaveRequest->setCreatedAt($leaveRequestDTO->getCreatedAt());
@@ -84,11 +84,11 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
             throw new LogicException('Leave request has been resolved');
         }
 
-        if ($leaveRequest->projectManagerApproved() && $userRole == UserRole::ROLE_PROJECT_MANAGER->value) {
+        if ($leaveRequest->getProjectManagerApproval() && $userRole == UserRole::ROLE_PROJECT_MANAGER->value) {
             throw new LogicException('Leave request already approved by project manager');
         }
 
-        if ($leaveRequest->teamLeaderApproved() && $userRole == UserRole::ROLE_TEAM_LEAD->value) {
+        if ($leaveRequest->getTeamLeaderApproval() && $userRole == UserRole::ROLE_TEAM_LEAD->value) {
             throw new LogicException('Leave request already approved by team leader');
         }
 
@@ -99,7 +99,7 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
             $leaveRequest->setProjectManagerApproval(true);
         }
 
-        if ($leaveRequest->projectManagerApproved() && $leaveRequest->teamLeaderApproved()) {
+        if ($leaveRequest->getProjectManagerApproval() && $leaveRequest->getTeamLeaderApproval()) {
             $leaveRequest->setStatus(LeaveStatus::APPROVED);
             $this->eventDispatcher->dispatch(new LeaveRequestApprovedEvent($leaveRequest), LeaveRequestApprovedEvent::NAME);
         }
@@ -124,11 +124,11 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
             throw new LogicException('Leave request has been resolved');
         }
 
-        if ($leaveRequest->projectManagerApproved() && $userRole == UserRole::ROLE_PROJECT_MANAGER->value) {
+        if ($leaveRequest->getProjectManagerApproval() && $userRole == UserRole::ROLE_PROJECT_MANAGER->value) {
             throw new LogicException('Leave request already approved by project manager');
         }
 
-        if ($leaveRequest->teamLeaderApproved() && $userRole == UserRole::ROLE_TEAM_LEAD->value) {
+        if ($leaveRequest->getTeamLeaderApproval() && $userRole == UserRole::ROLE_TEAM_LEAD->value) {
             throw new LogicException('Leave request already approved by team leader');
         }
 

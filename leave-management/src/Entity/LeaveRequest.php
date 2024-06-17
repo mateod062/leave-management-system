@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\LeaveRequestRepository;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -43,12 +44,12 @@ class LeaveRequest
     private bool $projectManagerApproval = false;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTime $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct()
     {
         $this->status = LeaveStatus::PENDING;
-        $this->createdAt = new DateTime();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function getUser(): User
@@ -101,7 +102,7 @@ class LeaveRequest
         $this->reason = $reason;
     }
 
-    public function teamLeaderApproved(): bool
+    public function getTeamLeaderApproval(): bool
     {
         return $this->teamLeaderApproval;
     }
@@ -111,7 +112,7 @@ class LeaveRequest
         $this->teamLeaderApproval = $teamLeaderApproval;
     }
 
-    public function projectManagerApproved(): bool
+    public function getProjectManagerApproval(): bool
     {
         return $this->projectManagerApproval;
     }
@@ -121,12 +122,12 @@ class LeaveRequest
         $this->projectManagerApproval = $projectManagerApproval;
     }
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTime $createdAt): void
+    public function setCreatedAt(DateTimeImmutable $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
