@@ -22,8 +22,12 @@ class PostCommentType extends AbstractType
                     new Length(['min' => 5, 'max' => 255])
                 ]
             ])
+            ->add('parentCommentId', TextType::class, [
+                'mapped' => false,
+                'required' => false
+            ])
             ->add('submit', SubmitType::class, [
-                'label' => 'Post Comment',
+                'label' => 'Post',
                 'attr' => ['class' => 'btn btn-primary']
             ]);
     }

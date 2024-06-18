@@ -1,0 +1,8 @@
+{% for reply in replies %}
+    <div class="reply">
+        <p>{{ reply.comment }}</p>
+        <span>{{ reply.user.username }}</span>
+        <a href="#" class="reply-button" data-comment-id="{{ reply.id }}">Reply</a>
+        {% include 'comment/replies.html.twig' with {'replies': reply.replies} %}
+    </div>
+{% endfor %}

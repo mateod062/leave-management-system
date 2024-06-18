@@ -1,0 +1,592 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.add-user-container {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+.add-user-container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.add-user-container input[type="text"],
+.add-user-container input[type="email"],
+.add-user-container input[type="password"],
+.add-user-container select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.add-user-container input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.add-user-container input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Admin Dashboard */
+.admin-dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+.admin-dashboard .navigation {
+    flex: 0 0 200px;
+}
+
+.admin-dashboard .navigation a {
+    display: block;
+    padding: 10px 0;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.admin-dashboard .navigation a:hover {
+    background-color: #f4f4f4;
+}
+
+.admin-dashboard .users,
+.admin-dashboard .leave-requests {
+    flex: 1 1 70%;
+    margin-left: 20px;
+}
+
+.admin-dashboard h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.admin-dashboard .user,
+.admin-dashboard .leave-request {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+.admin-dashboard .user span,
+.admin-dashboard .leave-request span {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.admin-dashboard .user a,
+.admin-dashboard .leave-request a {
+    margin-left: 10px;
+    text-decoration: none;
+    color: #4CAF50;
+}
+
+.admin-dashboard .user a:hover,
+.admin-dashboard .leave-request a:hover {
+    text-decoration: underline;
+}
+
+/* Edit User Container */
+.edit-user-container {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+.edit-user-container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.edit-user-container input[type="text"],
+.edit-user-container input[type="email"],
+.edit-user-container select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.edit-user-container input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.edit-user-container input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Employee Dashboard */
+.employee-dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+.employee-dashboard .navigation {
+    flex: 0 0 200px;
+}
+
+.employee-dashboard .navigation a {
+    display: block;
+    padding: 10px 0;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.employee-dashboard .navigation a:hover {
+    background-color: #f4f4f4;
+}
+
+.employee-dashboard .leave-balance {
+    margin-bottom: 20px;
+}
+
+.employee-dashboard .leave-balance h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.employee-dashboard .leave-requests {
+    flex: 1 1 70%;
+    margin-left: 20px;
+}
+
+.employee-dashboard h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.employee-dashboard .leave-request {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+.employee-dashboard .leave-request span {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.employee-dashboard .leave-request a {
+    margin-left: 10px;
+    text-decoration: none;
+    color: #4CAF50;
+}
+
+.employee-dashboard .leave-request a:hover {
+    text-decoration: underline;
+}
+
+.employee-dashboard .send-leave-request {
+    max-width: 400px;
+    margin-top: 20px;
+}
+
+.employee-dashboard .send-leave-request h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.employee-dashboard .send-leave-request form {
+    background: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.employee-dashboard .send-leave-request label,
+.employee-dashboard .send-leave-request textarea,
+.employee-dashboard .send-leave-request input[type="date"] {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.employee-dashboard .send-leave-request textarea {
+    height: 100px;
+}
+
+.employee-dashboard .send-leave-request button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.employee-dashboard .send-leave-request button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Leave History */
+.leave-history {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+.leave-history h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.leave-history .leave-request {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+.leave-history .leave-request span {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.leave-history .leave-request a {
+    margin-left: 10px;
+    text-decoration: none;
+    color: #4CAF50;
+}
+
+.leave-history .leave-request a:hover {
+    text-decoration: underline;
+}
+
+/* Leave Request Details */
+.leave-request-details {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+.leave-request-details h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.leave-request-details p {
+    margin-bottom: 10px;
+}
+
+.leave-request-details .comments {
+    margin-top: 20px;
+}
+
+.leave-request-details .comments h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.leave-request-details .comment {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.leave-request-details .comment p {
+    margin-bottom: 5px;
+}
+
+.leave-request-details .comment span {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.leave-request-details .comment a {
+    margin-left: 10px;
+    text-decoration: none;
+    color: #4CAF50;
+}
+
+.leave-request-details .comment a:hover {
+    text-decoration: underline;
+}
+
+.leave-request-details .reply {
+    margin-left: 20px;
+    padding: 10px;
+    background: #f2f2f2;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.leave-request-details .reply p {
+    margin-bottom: 5px;
+}
+
+.leave-request-details .reply span {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.login-container {
+    max-width: 380px;
+    padding: 15px;
+    margin: 100px auto;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-container form {
+    padding: 15px;
+}
+
+/* Input Styles */
+.login-container label {
+    font-weight: bold;
+}
+
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.login-container input[type="email"]:focus,
+.login-container input[type="password"]:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Button Styles */
+.login-container button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-container button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.login-container .alert {
+    margin-bottom: 15px;
+    padding: 15px;
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+}
+
+.notification-center {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+.notification-center h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.notification-center .notification {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+.team-lead-dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+.team-lead-dashboard h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.team-lead-dashboard .navigation {
+    background-color: #333;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.team-lead-dashboard .navigation a {
+    color: #fff;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.team-lead-dashboard .leave-balance {
+    margin-bottom: 20px;
+}
+
+.team-lead-dashboard .leave-balance h2 {
+    font-size: 1.2rem;
+}
+
+.team-lead-dashboard .leave-requests {
+    margin-bottom: 20px;
+}
+
+.team-lead-dashboard .leave-requests h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.team-lead-dashboard .leave-request {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+.team-lead-dashboard .team-members {
+    margin-bottom: 20px;
+}
+
+.team-lead-dashboard .team-members h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.team-lead-dashboard .team-member {
+    margin-bottom: 10px;
+}
+
+.team-lead-dashboard .send-leave-request {
+    margin-bottom: 20px;
+}
+
+.team-lead-dashboard .send-leave-request h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.team-lead-dashboard form {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+.team-lead-dashboard label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.team-lead-dashboard input[type="date"],
+.team-lead-dashboard textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.team-lead-dashboard button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.team-lead-dashboard button:hover {
+    background-color: #555;
+}
+
+/* General Styles */
+.team-calendar {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+.team-calendar h1 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.team-calendar table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.team-calendar th,
+.team-calendar td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.team-calendar .event {
+    margin-top: 5px;
+    padding: 5px;
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+}
+
+.team-calendar .event span {
+    margin-right: 5px;
+}
+
+
+

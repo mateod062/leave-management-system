@@ -21,20 +21,26 @@
                 <div class="comment">
                     <p>{{ comment.comment }}</p>
                     <span>{{ comment.user.username }}</span>
-                    {# TODO #}
-                    <a>Reply</a>
+                    <a href="#" class="reply-button" data-comment-id="{{ comment.id }}">Reply</a>
+                    {% include 'comment/replies.html.twig' with {'replies': comment.replies} %}
                 </div>
-                {% for reply in comment.replies %}
-                    <div class="reply">
-                        <p>{{ reply.comment }}</p>
-                        <span>{{ reply.user.username }}</span>
-                    </div>
-                {% endfor %}
             {% endif %}
         {% endfor %}
     </div>
 
     {% include 'comment/create.html.twig' %}
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.reply-button').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                document.getElementById('post_comment_parentCommentId').value = event.target.getAttribute('data-comment-id');
+                document.getElementById('post_comment_submit').value = 'Reply';
+            });
+        });
+    });
+</script>
 </body>
 </html>

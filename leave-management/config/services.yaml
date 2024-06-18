@@ -41,3 +41,7 @@ services:
     App\EventSubscriber\CommentReplySubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
+
+    App\Validator\Constraints\ValidLeaveRequestDatesValidator:
+        tags: [validator.constraint_validator]
+

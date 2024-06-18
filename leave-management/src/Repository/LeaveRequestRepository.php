@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\LeaveRequest;
+use App\Entity\User;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -49,6 +50,21 @@ class LeaveRequestRepository extends ServiceEntityRepository
             ->andWhere('u.team = :teamId')
             ->andWhere('lr.startDate BETWEEN :startDate AND :endDate')
             ->setParameter('teamId', $teamId)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findOverlapping(User $user, DateTime $startDate, DateTime $endDate): array
+    {
+        return $this->createQueryBuilder('lr')
+            ->where('lr.user = :user')
+            ->andWhere('lr.status = approved')
+            ->andWhere('(
+            (lr.startDate <= :endDate AND lr.endDate >= :startDate)
+            )')
+            ->setParameter('user', $user)
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
             ->getQuery()

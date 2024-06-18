@@ -7,10 +7,13 @@ use App\DTO\LeaveRequestDayDTO;
 use App\DTO\LeaveRequestDTO;
 use App\DTO\LeaveRequestFilterDTO;
 use App\Repository\LeaveRequestRepository;
+use App\Repository\UserRepository;
 use App\Service\LeaveRequest\Interface\LeaveRequestQueryServiceInterface;
 use App\Service\Mapper\MapperService;
 use DateTime;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use ReflectionException;
 
 class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
@@ -19,6 +22,7 @@ class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
 
     public function __construct(
         private readonly LeaveRequestRepository $leaveRequestRepository,
+        private readonly UserRepository         $userRepository,
         private readonly MapperService          $mapperService
     ) {}
 
@@ -45,6 +49,17 @@ class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
         }
 
         return new LeaveRequestCalendarDTO($startDate->format('F'), $year, $days);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function getOverlappingLeaveRequests(int $userId, DateTime $startDate, DateTime $endDate): array
+    {
+        $user = $this->userRepository->find($userId);
+        $overlappingLeaveRequests = $this->leaveRequestRepository->findOverlapping($user, $startDate, $endDate);
+
+        return array_map(fn($leaveRequest) => $this->mapperService->mapToDTO($leaveRequest), $overlappingLeaveRequests);
     }
 
     /**

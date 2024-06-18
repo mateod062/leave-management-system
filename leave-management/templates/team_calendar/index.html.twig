@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Team Calendar - {{ calendar.year }}-{{ calendar.month|date('F') }}</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+</head>
+<body>
+<div class="team-calendar">
+    <h1>Team Calendar - {{ calendar.year }} {{ calendar.month|date('F') }}</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>S</th>
+            <th>M</th>
+            <th>T</th>
+            <th>W</th>
+            <th>T</th>
+            <th>F</th>
+            <th>S</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% set daysInWeek = 7 %}
+        {% set currentDay = 0 %}
+        {% for week in range(1, ((calendar.days|length + (calendar.days[0].dayOrder - 1)) / daysInWeek)|round(0, 'ceil')) %}
+            <tr>
+                {% for dayOfWeek in 1..daysInWeek %}
+                    {% set day = calendar.days[currentDay] if currentDay < calendar.days|length and dayOfWeek >= day.dayOrder else null %}
+                    <td>
+                        {% if day is not null %}
+                            {{ day.dayOrder }}
+                            {% for request in day.leaveRequests %}
+                                <div class="event">
+                                    <span>{{ request.user.username }}</span>
+                                    <span>{{ request.type }}</span>
+                                </div>
+                            {% endfor %}
+                            {% set currentDay = currentDay + 1 %}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
