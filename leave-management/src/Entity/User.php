@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Unique;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements PasswordAuthenticatedUserInterface, UserInterface
@@ -22,10 +23,12 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     #[ORM\Column(length: 50, unique: true)]
     #[NotBlank]
+    #[Unique]
     private string $username;
 
     #[ORM\Column(length: 100, unique: true)]
     #[Email]
+    #[Unique]
     private string $email;
 
     #[ORM\Column(length: 255)]
@@ -36,7 +39,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     #[ORM\OneToOne(targetEntity: Team::class, inversedBy: "teamLead")]
     #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
-    private Team $leadingTeam;
+    private ?Team $leadingTeam;
 
     #[ORM\OneToMany(targetEntity: Team::class, mappedBy: "projectManager")]
     private Collection $managedTeams;

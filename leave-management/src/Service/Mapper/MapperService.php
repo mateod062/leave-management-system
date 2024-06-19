@@ -10,6 +10,7 @@ use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use UnitEnum;
 
 class MapperService implements MapperServiceInterface
 {
@@ -37,6 +38,11 @@ class MapperService implements MapperServiceInterface
             $propertyName = $property->getName();
             if ($dtoReflection->hasProperty($propertyName)) {
                 $value = $this->propertyAccessor->getValue($entity, $propertyName);
+
+                if ($value instanceof UnitEnum) {
+                    $value = $value->name;
+                }
+
                 $this->propertyAccessor->setValue($dto, $propertyName, $value);
             } elseif (str_contains($propertyName, 'Id')) {
                 $entityProperty = str_replace('Id', '', $propertyName);
@@ -75,6 +81,15 @@ class MapperService implements MapperServiceInterface
             try {
                 if ($entityReflection->hasProperty($propertyName)) {
                     $value = $this->propertyAccessor->getValue($dto, $propertyName);
+
+                    $entityPropertyReflection = $entityReflection->getProperty($propertyName);
+                    $entityPropertyType = $entityPropertyReflection->getType();
+
+                    if ($entityPropertyType && $entityPropertyType->isBuiltin() === false && enum_exists($entityPropertyType->getName())) {
+                        $enumClass = $entityPropertyType->getName();
+                        $value = $enumClass::from($value);
+                    }
+
                     $this->propertyAccessor->setValue($entity, $propertyName, $value);
                 } elseif (str_contains($propertyName, 'Id')) {
                     $entityProperty = str_replace('Id', '', $propertyName);

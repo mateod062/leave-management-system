@@ -3,7 +3,9 @@
 namespace App\Form;
 
 use App\DTO\UserCreationDTO;
+use App\DTO\UserDTO;
 use App\Entity\Team;
+use App\Entity\User;
 use App\Entity\UserRole;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -29,14 +31,12 @@ class UserType extends AbstractType
                 'constraints' => [
                     new NotBlank(),
                     new Length(['min' => 2, 'max' => 255]),
-                    new Unique(['entityClass' => 'App\Entity\User', 'field' => 'username'])
                 ]
             ])
             ->add('email', EmailType::class, [
                 'constraints' => [
                     new NotBlank(),
                     new Email(),
-                    new Unique(['entityClass' => 'App\Entity\User', 'field' => 'email'])
                 ]
             ])
             ->add('password', PasswordType::class, [
@@ -66,10 +66,7 @@ class UserType extends AbstractType
             ])
             ->add('team', EntityType::class, [
                 'class' => Team::class,
-                'choice_label' => 'name',
-                'constraints' => [
-                    new NotBlank()
-                ]
+                'choice_label' => 'name'
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Submit',
@@ -80,7 +77,6 @@ class UserType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => UserCreationDTO::class,
         ]);
     }
 }

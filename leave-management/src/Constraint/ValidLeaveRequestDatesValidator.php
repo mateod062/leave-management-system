@@ -3,6 +3,7 @@
 namespace App\Constraint;
 
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
+use Carbon\Carbon;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -22,8 +23,11 @@ class ValidLeaveRequestDatesValidator extends ConstraintValidator
 
         $startDate = $value['startDate'];
         $endDate = $value['endDate'];
-        $interval = $startDate->diff($endDate);
-        $daysRequested = $interval->days + 1;
+
+        $start = Carbon::instance($startDate);
+        $end = Carbon::instance($endDate);
+
+        $daysRequested = $start->diffInWeekdays($end) + 1;
 
         $user = $this->authenticationService->getAuthenticatedUser();
         $userLeaveBalance = $user->getLeaveBalance();

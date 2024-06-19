@@ -10,11 +10,23 @@
 <div class="edit-user-container">
     <h1>Edit User</h1>
     {{ form_start(form) }}
-    {{ form_row(form.username) }}
-    {{ form_row(form.email) }}
-    {{ form_row(form.role) }}
-    {{ form_row(form.team) }}
-    {{ form_row(form.submit) }}
+
+    {% for field in form %}
+        {% if field.vars.name == '_token' %}
+            {{ form_widget(field) }}
+        {% else %}
+            <div class="form-group">
+                {{ form_label(field) }}
+                {{ form_widget(field) }}
+                {% if field.vars.name != 'submit' %}
+                    <div class="form-error">
+                        {{ form_errors(field) }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+
     {{ form_end(form) }}
 </div>
 </body>

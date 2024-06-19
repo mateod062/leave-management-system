@@ -85,7 +85,7 @@ class UserController extends AbstractController
         }
     }
 
-    #[Route('/users', name: 'create_user', methods: ['POST'])]
+    #[Route('/add-user', name: 'create_user', methods: ['GET', 'POST'])]
     public function createUser(Request $request): Response
     {
         $form = $this->createForm(UserType::class);
@@ -93,7 +93,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !$form->isValid()) {
-            return $this->json($form->getErrors(true), Response::HTTP_BAD_REQUEST);
+            return $this->render('admin/add_user.html.twig', ['form' => $form->createView()]);
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -119,9 +119,7 @@ class UserController extends AbstractController
                         $this->json(['error' => 'Invalid role'], Response::HTTP_BAD_REQUEST);
                 }
 
-                return $this->redirectToRoute('admin/dashboard.html.twig',[
-                    'id' => $this->authenticationService->getAuthenticatedUser()->getId()
-                ]);
+                return $this->redirectToRoute('create_user');
             } catch (Exception $e) {
                 return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
@@ -135,7 +133,7 @@ class UserController extends AbstractController
      * @throws ReflectionException
      * @throws ORMException
      */
-    #[Route('/users/{id}', name: 'update_user', methods: ['PUT'])]
+    #[Route('/edit-user/{id}', name: 'edit_user', methods: ['GET', 'POST'])]
     public function updateUser(Request $request): Response
     {
         $userId = $request->attributes->get('id');
@@ -151,7 +149,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && !$form->isValid()) {
-            return $this->json($form->getErrors(true), Response::HTTP_BAD_REQUEST);
+            return $this->render('admin/edit_user.html.twig', ['form' => $form->createView()]);
         }
 
         if ($form->isSubmitted() && $form->isValid()) {

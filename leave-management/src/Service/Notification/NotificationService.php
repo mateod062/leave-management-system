@@ -80,7 +80,6 @@ class NotificationService implements NotificationServiceInterface
         $teamLead = $this->teamService->getTeamLead($user->getTeamId());
 
         $leaveRequestMembers = [
-            $user->getId(),
             $projectManager->getId(),
             $teamLead->getId()
             ];

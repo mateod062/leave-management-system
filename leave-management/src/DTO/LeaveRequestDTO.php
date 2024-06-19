@@ -14,7 +14,7 @@ public function __construct(
         private ?DateTime $startDate = null,
         private ?DateTime $endDate = null,
         private ?string  $reason = null,
-        private LeaveStatus   $status = LeaveStatus::PENDING,
+        private string   $status = LeaveStatus::PENDING->value,
         private ?bool     $teamLeaderApproval = null,
         private ?bool     $projectManagerApproval = null,
         private DateTimeImmutable $createdAt = new DateTimeImmutable(),
@@ -60,12 +60,12 @@ public function __construct(
         $this->endDate = $endDate;
     }
 
-    public function getStatus(): LeaveStatus
+    public function getStatus(): string
     {
         return $this->status;
     }
 
-    public function setStatus(LeaveStatus $status): void
+    public function setStatus(string $status): void
     {
         $this->status = $status;
     }
