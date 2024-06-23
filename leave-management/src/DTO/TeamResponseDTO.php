@@ -7,6 +7,9 @@ class TeamResponseDTO
     public function __construct(
         private ?int $id = null,
         private ?string $name = null,
+        /**
+         * @var UserDTO[]
+         */
         private array $members = []
     ) {}
 

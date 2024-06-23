@@ -48,9 +48,7 @@ class NotificationService implements NotificationServiceInterface
      */
     public function sendNotification(NotificationDTO $notificationDTO): void
     {
-        $notification = new Notification();
-        $notification->setMessage($notificationDTO->getMessage());
-        $notification->setUser($this->mapperService->mapToEntity($this->userQueryService->getUserById($notificationDTO->getUserId())));
+        $notification = $this->mapperService->mapToEntity($notificationDTO);
 
         $this->notificationRepository->save($notification);
     }
@@ -76,6 +74,12 @@ class NotificationService implements NotificationServiceInterface
     {
         $leaveRequest = $this->leaveRequestQueryService->getLeaveRequestById($leaveRequestId);
         $user = $this->userQueryService->getUserById($leaveRequest->getUserId());
+
+        if ($user->getTeamId() === null) {
+            return;
+        }
+
+
         $projectManager = $this->teamService->getProjectManager($user->getTeamId());
         $teamLead = $this->teamService->getTeamLead($user->getTeamId());
 
@@ -122,9 +126,8 @@ class NotificationService implements NotificationServiceInterface
     public function notifyCommentPosted(int $commentId): void
     {
         $comment = $this->commentService->getCommentById($commentId);
-        $leaveRequest = $this->leaveRequestQueryService->getLeaveRequestById($commentId);
+        $leaveRequest = $this->leaveRequestQueryService->getLeaveRequestById($comment->getLeaveRequestId());
         $commentPoster = $this->userQueryService->getUserById($comment->getUserId());
-
         $message = sprintf('%s posted a comment on your leave request', $commentPoster->getUsername());
         $this->sendNotification(new NotificationDTO($message, $leaveRequest->getUserId()));
     }
@@ -138,7 +141,6 @@ class NotificationService implements NotificationServiceInterface
     {
         $comment = $this->commentService->getCommentById($commentId);
         $parentComment = $this->commentService->getCommentById($comment->getParentCommentId());
-        $leaveRequest = $this->leaveRequestQueryService->getLeaveRequestById($commentId);
         $commentPoster = $this->userQueryService->getUserById($comment->getUserId());
 
         $replyMessage = sprintf('%s replied to your comment', $commentPoster->getUsername());

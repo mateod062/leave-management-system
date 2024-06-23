@@ -4,14 +4,36 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <link rel="stylesheet" href="{{ asset('css/sytle.css') }}">
+    <script>
+        async function deleteUser(userId) {
+            try {
+                const response = await fetch(`/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    alert('User deleted successfully');
+                    location.reload();
+                } else {
+                    const data = await response.json();
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the user');
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="admin-dashboard">
         <div class="navigation">
             <a href="#users">View Users</a>
-            <a href="{{ path('create_user') }}">Leaves</a>
+            <a href="{{ path('create_user') }}">Add User</a>
             <a href="#leave_requests">View All Leave Requests</a>
-            <a href="{{ path('logout') }}">Logout</a>
+            <a href="{{ path('app_logout') }}">Logout</a>
         </div>
         <div class="users" id="users">
             <h2>Users</h2>
@@ -19,8 +41,8 @@
                 <div class="user">
                     <span>{{ user.username }}</span>
                     <p>{{ user.role }}</p>
-                    <a href="{{ path('update_user', {'id': user.id}) }}">Edit</a>
-                    <a href="{{ path('delete_user', {'id': user.id}) }}">Delete</a>
+                    <a href="{{ path('edit_user', {'id': user.id}) }}">Edit</a>
+                    <a href="javascript:void(0);" onclick="deleteUser({{ user.id }})">Delete</a>
                 </div>
             {% endfor %}
         </div>
@@ -28,8 +50,8 @@
             <h2>Leave Requests</h2>
             {% for leave_request in leave_requests %}
                 <div class="leave-request">
-                    <span>{{ leave_request.user.username }} | {{ leave_request.startDate|date('d/m/Y') }} - {{ leave_request.endDate|date('d/m/Y') }}</span>
-                    <a href="{{ path('leave_request_details', {'id': leave_request.id}) }}">Details</a>
+                    <span>{{ leave_request.user.username }} | {{ leave_request.request.startDate|date('d/m/Y') }} - {{ leave_request.request.endDate|date('d/m/Y') }}</span>
+                    <a href="{{ path('leave_request_details', {'id': leave_request.request.id}) }}">Details</a>
                 </div>
             {% endfor %}
         </div>

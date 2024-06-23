@@ -2,7 +2,9 @@
 
 namespace App\Service\Comment;
 
-use App\DTO\CommentDTO;
+use App\DTO\CommentCreationDTO;
+use App\DTO\CommentResponseDTO;
+use App\Entity\Comment;
 use App\Event\CommentPostedEvent;
 use App\Event\CommentReplyEvent;
 use App\Repository\CommentRepository;
@@ -33,7 +35,7 @@ class CommentService implements CommentServiceInterface
     /**
      * @throws ReflectionException
      */
-    public function getCommentById(int $commentId): CommentDTO
+    public function getCommentById(int $commentId): CommentResponseDTO
     {
         $comment = $this->commentRepository->find($commentId);
 
@@ -41,7 +43,7 @@ class CommentService implements CommentServiceInterface
             throw new EntityNotFoundException(sprintf('%s with id %s not found', self::ENTITY, $commentId));
         }
 
-        return $this->mapperService->mapToDTO($comment);
+        return $this->mapperService->mapToDTO($comment, CommentResponseDTO::class);
     }
 
     /**
@@ -49,10 +51,10 @@ class CommentService implements CommentServiceInterface
      * @throws ReflectionException
      * @throws ORMException
      */
-    public function addComment(CommentDTO $comment): CommentDTO
+    public function addComment(CommentCreationDTO $comment): CommentResponseDTO
     {
-        $commentEntity = $this->mapperService->mapToEntity($comment);
-        $this->commentRepository->save($commentEntity);
+        $commentEntity = $this->mapperService->mapToEntity($comment, Comment::class);
+        $commentEntity = $this->commentRepository->save($commentEntity);
 
         if (!$comment->getParentCommentId()) {
             $this->eventDispatcher->dispatch(new CommentPostedEvent($commentEntity), CommentPostedEvent::NAME);
@@ -60,22 +62,22 @@ class CommentService implements CommentServiceInterface
             $this->eventDispatcher->dispatch(new CommentReplyEvent($commentEntity), CommentReplyEvent::NAME);
         }
 
-        return $this->mapperService->mapToDTO($commentEntity);
+        return $this->mapperService->mapToDTO($commentEntity, CommentResponseDTO::class);
     }
 
     /**
      * @throws ReflectionException
      */
-    public function updateComment(CommentDTO $comment): CommentDTO
+    public function updateComment(int $id, CommentCreationDTO $comment): CommentResponseDTO
     {
-        $commentEntity = $this->commentRepository->find($comment->getId());
+        $commentEntity = $this->commentRepository->find($id);
         if ($commentEntity === null) {
             throw new EntityNotFoundException(sprintf('%s with id %s not found', self::ENTITY, $comment->getId()));
         }
-        $commentEntity->setComment($comment->getComment());
+        $commentEntity->setMessage($comment->getMessage());
         $commentEntity->setCreatedAt($comment->getCreatedAt());
 
-        return $this->mapperService->mapToDTO($this->commentRepository->save($commentEntity));
+        return $this->mapperService->mapToDTO($this->commentRepository->save($commentEntity), CommentResponseDTO::class);
     }
 
     public function deleteComment(int $commentId): void

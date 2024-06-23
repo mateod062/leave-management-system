@@ -14,7 +14,7 @@ use ReflectionException;
 
 class TeamFixtures extends Fixture implements DependentFixtureInterface
 {
-    private function __construct(
+    public function __construct(
         private readonly TeamService $teamService,
     ) {}
 
@@ -36,7 +36,7 @@ class TeamFixtures extends Fixture implements DependentFixtureInterface
 
         $teamDTO = new TeamCreationDTO(
             name: $faker->company,
-            members: [
+            membersIds: [
                 $this->getReference(UserFixtures::TEAM_LEAD_REFERENCE)->getId(),
                 $this->getReference(UserFixtures::PROJECT_MANAGER_REFERENCE)->getId()
             ],

@@ -11,14 +11,12 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
-use Psr\Log\LoggerInterface;
 use ReflectionException;
 
 class LeaveRequestFixtures extends Fixture implements DependentFixtureInterface
 {
     public function __construct(
         private readonly LeaveRequestPersistenceService $leaveRequestService,
-        private readonly LoggerInterface $logger
     )
     {}
 
@@ -26,7 +24,7 @@ class LeaveRequestFixtures extends Fixture implements DependentFixtureInterface
     public function getDependencies(): array
     {
         return [
-            UserFixtures::class
+            TeamFixtures::class
         ];
     }
 
@@ -39,19 +37,19 @@ class LeaveRequestFixtures extends Fixture implements DependentFixtureInterface
     {
         $faker = Factory::create();
 
-        $teamLead = $this->getReference(UserFixtures::TEAM_LEAD_REFERENCE);
+        $teamMembers = $manager->getRepository(User::class)->findAll();
 
-        $this->logger->info("Team lead id: {$teamLead->getId()}");
+        foreach ($teamMembers as $teamMember) {
+            for ($i = 0; $i < 5; $i++) {
+                $leaveRequestDTO = new LeaveRequestDTO(
+                    userId: $teamMember->getId(),
+                    startDate: $faker->dateTimeBetween('-10 days'),
+                    endDate: $faker->dateTimeBetween('now', '+10 days'),
+                    reason: $faker->text
+                );
 
-        for ($i = 0; $i < 5; $i++) {
-            $leaveRequestDTO = new LeaveRequestDTO(
-                userId: $teamLead->getId(),
-                startDate: $faker->dateTimeBetween('-10 days'),
-                endDate: $faker->dateTimeBetween('now', '+10 days'),
-                reason: $faker->text
-            );
-
-            $this->leaveRequestService->createLeaveRequest($leaveRequestDTO);
+                $this->leaveRequestService->createLeaveRequest($leaveRequestDTO);
+            }
         }
     }
 }

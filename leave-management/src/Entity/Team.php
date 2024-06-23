@@ -22,7 +22,7 @@ class Team
     #[NotBlank]
     private string $name;
 
-    #[ORM\OneToOne(targetEntity: Team::class, inversedBy: "leadingTeam")]
+    #[ORM\OneToOne(targetEntity: User::class, inversedBy: "leadingTeam")]
     #[ORM\JoinColumn(unique: true, nullable: false, onDelete: "CASCADE")]
     #[NotNull]
     private User $teamLead;
@@ -32,6 +32,9 @@ class Team
     #[NotNull]
     private User $projectManager;
 
+    /**
+     * @var Collection<int, User>
+     */
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: "team")]
     private Collection $members;
 
@@ -75,9 +78,9 @@ class Team
         return $this->members;
     }
 
-    public function setMembers(Collection $members): void
+    public function setMembers(array $members): void
     {
-        $this->members = $members;
+        $this->members = new ArrayCollection($members);
     }
 
     public function getId(): ?int

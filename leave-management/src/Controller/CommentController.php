@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\DTO\CommentDTO;
+use App\DTO\CommentCreationDTO;
+use App\DTO\CommentResponseDTO;
 use App\Form\PostCommentType;
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
 use App\Service\Auth\Interface\AuthorizationServiceInterface;
@@ -47,14 +48,12 @@ class CommentController extends AbstractController
             $data = $form->getData();
 
             try {
-                $comment = $this->commentService->addComment(new CommentDTO(
+                $comment = $this->commentService->addComment(new CommentCreationDTO(
                     userId: $this->authenticationService->getAuthenticatedUser()->getId(),
                     leaveRequestId: $request->attributes->get('leaveRequestId'),
                     parentCommentId: $data['parentCommentId'],
-                    comment: $data['comment']
+                    message: $data['comment']
                 ));
-
-                $this->commentService->addComment($comment);
             } catch (OptimisticLockException|ReflectionException $e) {
                 return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
             } catch (EntityNotFoundException $e) {
@@ -77,11 +76,11 @@ class CommentController extends AbstractController
         try {
             $parentComment = $this->commentService->getCommentById($request->attributes->get('parentCommentId'));
 
-            $comment = $this->commentService->addComment(new CommentDTO(
+            $comment = $this->commentService->addComment(new CommentCreationDTO(
                 userId: $this->authenticationService->getAuthenticatedUser()->getId(),
                 leaveRequestId: $parentComment->getLeaveRequestId(),
                 parentCommentId: $parentComment->getId(),
-                comment: $data['comment']
+                message: $data['comment']
             ));
 
             return $this->json($comment);
@@ -98,6 +97,7 @@ class CommentController extends AbstractController
     public function editComment(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        $commentId = $request->attributes->get('commentId');
 
         try {
             $comment = $this->commentService->getCommentById($request->attributes->get('commentId'));
@@ -106,8 +106,13 @@ class CommentController extends AbstractController
                 return $this->json(['error' => 'You are not authorized to edit this comment'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $comment->setComment($data['comment']);
-            $comment = $this->commentService->updateComment($comment);
+            $newComment = new CommentCreationDTO(
+                userId: $comment->getUserId(),
+                leaveRequestId: $comment->getLeaveRequestId(),
+                parentCommentId: $comment->getParentCommentId(),
+                message: $data['message']
+            );
+            $comment = $this->commentService->updateComment($commentId, $newComment);
 
             return $this->json($comment);
         } catch (ReflectionException $e) {

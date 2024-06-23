@@ -40,7 +40,7 @@ class TeamController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $team = new TeamCreationDTO(
             name: $data['name'],
-            members: $data['members'],
+            membersIds: $data['members'],
             teamLeadId: $data['teamLeadId'],
             projectManagerId: $data['projectManagerId']
         );

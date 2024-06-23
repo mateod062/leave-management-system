@@ -2,12 +2,15 @@
 
 namespace App\DataFixtures;
 
-use App\DTO\CommentDTO;
+use App\DTO\CommentCreationDTO;
+use App\DTO\CommentResponseDTO;
 use App\Entity\LeaveRequest;
 use App\Entity\User;
 use App\Service\Comment\CommentService;
+use App\Service\Comment\Interface\CommentServiceInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\ObjectManager;
@@ -16,15 +19,14 @@ use ReflectionException;
 
 class CommentFixtures extends Fixture implements DependentFixtureInterface
 {
-    private function __construct(
-        private readonly CommentService $commentService,
+    public function __construct(
+        private readonly CommentServiceInterface $commentService,
     )
     {}
 
     public function getDependencies(): array
     {
         return [
-            UserFixtures::class,
             LeaveRequestFixtures::class
         ];
     }
@@ -44,23 +46,24 @@ class CommentFixtures extends Fixture implements DependentFixtureInterface
 
         foreach ($leaveRequests as $leaveRequest) {
             for ($i = 0; $i < 5; $i++) {
-                $commentDTO = new CommentDTO(
+                $commentDTO = new CommentCreationDTO(
                     userId: $faker->randomElement($users)->getId(),
                     leaveRequestId: $leaveRequest->getId(),
-                    comment: $faker->text
+                    message: $faker->text
                 );
 
-                $this->commentService->addComment($commentDTO);
-                $comments[] = $commentDTO;
+                $savedComment = $this->commentService->addComment($commentDTO);
+                $comments[] = $savedComment;
             }
         }
 
+
         foreach ($comments as $comment) {
-            $replyDTO = new CommentDTO(
+            $replyDTO = new CommentCreationDTO(
                 userId: $faker->randomElement($users)->getId(),
-                leaveRequestId: $comment->leaveRequestId,
-                parentCommentId: $faker->randomElement([null, $faker->randomElement($comments)->id]),
-                comment: $faker->text
+                leaveRequestId: $comment->getLeaveRequestId(),
+                parentCommentId: $faker->randomElement([null, $faker->randomElement($comments)->getId()]),
+                message: $faker->text
             );
 
             $this->commentService->addComment($replyDTO);

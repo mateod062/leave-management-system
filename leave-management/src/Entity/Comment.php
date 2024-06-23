@@ -28,7 +28,7 @@ class Comment
 
     #[ORM\Column(type: Types::TEXT, nullable: false)]
     #[NotBlank]
-    private string $comment;
+    private string $message;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false)]
     #[NotBlank]
@@ -36,11 +36,12 @@ class Comment
 
     #[ORM\ManyToOne(targetEntity: Comment::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
-    private Comment $parentComment;
+    private ?Comment $parentComment;
 
     public function __construct()
     {
         $this->createdAt = new DateTimeImmutable();
+        $this->parentComment = null;
     }
 
     public function getUser(): User
@@ -63,14 +64,14 @@ class Comment
         $this->leaveRequest = $leaveRequest;
     }
 
-    public function getComment(): string
+    public function getMessage(): string
     {
-        return $this->comment;
+        return $this->message;
     }
 
-    public function setComment(string $comment): void
+    public function setMessage(string $message): void
     {
-        $this->comment = $comment;
+        $this->message = $message;
     }
 
     public function getCreatedAt(): DateTimeImmutable
@@ -83,12 +84,12 @@ class Comment
         $this->createdAt = $createdAt;
     }
 
-    public function getParentComment(): Comment
+    public function getParentComment(): ?Comment
     {
         return $this->parentComment;
     }
 
-    public function setParentComment(Comment $parentComment): void
+    public function setParentComment(?Comment $parentComment): void
     {
         $this->parentComment = $parentComment;
     }

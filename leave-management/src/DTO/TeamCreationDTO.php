@@ -5,11 +5,14 @@ namespace App\DTO;
 class TeamCreationDTO
 {
     public function __construct(
-        private ?int $id = null,
+        private ?int    $id = null,
         private ?string $name = null,
-        private array $members = [],
-        private ?int $teamLeadId = null,
-        private ?int $projectManagerId = null
+        /**
+         * @var int[]
+         */
+        private array   $membersIds = [],
+        private ?int    $teamLeadId = null,
+        private ?int    $projectManagerId = null
     )
     {}
 
@@ -23,14 +26,14 @@ class TeamCreationDTO
         $this->name = $name;
     }
 
-    public function getMembers(): array
+    public function getMembersIds(): array
     {
-        return $this->members;
+        return $this->membersIds;
     }
 
-    public function setMembers(array $members): void
+    public function setMembersIds(array $membersIds): void
     {
-        $this->members = $members;
+        $this->membersIds = $membersIds;
     }
 
     public function getTeamLeadId(): ?int

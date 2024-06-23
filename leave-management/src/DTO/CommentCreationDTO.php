@@ -4,27 +4,15 @@ namespace App\DTO;
 
 use DateTimeImmutable;
 
-class CommentDTO
+class CommentCreationDTO
 {
     public function __construct(
-        private ?int $id = null,
-        private ?int $userId = null,
-        private ?int $leaveRequestId = null,
-        private ?int $parentCommentId = null,
-        private ?string $comment = null,
+        private ?int              $userId = null,
+        private ?int              $leaveRequestId = null,
+        private ?int              $parentCommentId = null,
+        private ?string           $message = null,
         private DateTimeImmutable $createdAt = new DateTimeImmutable(),
-
     ) {}
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function setId(?int $id): void
-    {
-        $this->id = $id;
-    }
 
     public function getUserId(): int
     {
@@ -56,14 +44,14 @@ class CommentDTO
         $this->parentCommentId = $parentCommentId;
     }
 
-    public function getComment(): string
+    public function getMessage(): string
     {
-        return $this->comment;
+        return $this->message;
     }
 
-    public function setComment(string $comment): void
+    public function setMessage(string $message): void
     {
-        $this->comment = $comment;
+        $this->message = $message;
     }
 
     public function getCreatedAt(): DateTimeImmutable

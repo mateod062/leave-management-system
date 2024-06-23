@@ -23,10 +23,10 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
     private function getDefaultTargetPath(string $role): string
     {
         return match ($role) {
-            'ROLE_ADMIN' => '/admin',
-            'ROLE_EMPLOYEE' => '/employee',
-            'ROLE_PROJECT_MANAGER' => '/project-manager',
-            'ROLE_TEAM_LEAD' => '/team-lead',
+            'ROLE_ADMIN' => '/admin/dashboard',
+            'ROLE_EMPLOYEE' => '/employee/dashboard',
+            'ROLE_PROJECT_MANAGER' => '/project-manager/dashboard',
+            'ROLE_TEAM_LEAD' => '/team-lead/dashboard',
             default => '/',
         };
     }

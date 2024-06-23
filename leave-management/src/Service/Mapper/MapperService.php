@@ -2,7 +2,10 @@
 
 namespace App\Service\Mapper;
 
+use App\Entity\Comment;
 use App\Service\Mapper\Interface\MapperServiceInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
@@ -25,6 +28,7 @@ class MapperService implements MapperServiceInterface
      */
     public function mapToDTO(object $entity, string $dtoClass = null): object
     {
+        // Regular DTO mapping
         if ($dtoClass === null) {
             $className = (new ReflectionClass($entity))->getShortName();
             $dtoClass = 'App\\DTO\\' . $className . 'DTO';
@@ -36,7 +40,15 @@ class MapperService implements MapperServiceInterface
 
         foreach ($entityReflection->getProperties() as $property) {
             $propertyName = $property->getName();
-            if ($dtoReflection->hasProperty($propertyName)) {
+
+            // If the property is an entity collection, map it to an array of DTOs
+            if ($dtoReflection->hasProperty($propertyName) && $this->propertyAccessor->getValue($entity, $propertyName) instanceof Collection) {
+                $entityClass = $this->getEntityClassFromDocBlock($entityReflection->getProperty($propertyName)->getDocComment());
+                $value = $this->mapToDTOArray($this->propertyAccessor->getValue($entity, $propertyName), $entityClass);
+                $this->propertyAccessor->setValue($dto, $propertyName, $value);
+            }
+            // Regular property mapping
+            elseif ($dtoReflection->hasProperty($propertyName)) {
                 $value = $this->propertyAccessor->getValue($entity, $propertyName);
 
                 if ($value instanceof UnitEnum) {
@@ -44,15 +56,19 @@ class MapperService implements MapperServiceInterface
                 }
 
                 $this->propertyAccessor->setValue($dto, $propertyName, $value);
-            } elseif (str_contains($propertyName, 'Id')) {
-                $entityProperty = str_replace('Id', '', $propertyName);
-                if ($entityReflection->hasProperty($entityProperty)) {
-                    $associatedEntity = $this->propertyAccessor->getValue($entity, $entityProperty);
-                    if ($associatedEntity) {
-                        $associatedEntityId = $this->propertyAccessor->getValue($associatedEntity, 'id');
-                        $this->propertyAccessor->setValue($dto, $propertyName, $associatedEntityId);
-                    }
+            }
+            // If the property is an entity, map it to an id
+            elseif ($dtoReflection->hasProperty($propertyName . 'Id')) {
+                $associatedEntity = $this->getPropertyValueSafely($entity, $propertyName);
+                if ($associatedEntity) {
+                    $associatedEntityId = $this->propertyAccessor->getValue($associatedEntity, 'id');
+                    $this->propertyAccessor->setValue($dto, $propertyName . 'Id', $associatedEntityId);
                 }
+            }
+            // If the property is an entity collection, map it to an array of ids
+            elseif ($dtoReflection->hasProperty($propertyName . 'Ids')) {
+                $value = $this->getIdsFromCollectionOrArray($property->getValue());
+                $this->propertyAccessor->setValue($dto, $propertyName . 'Ids', $value);
             }
         }
 
@@ -66,6 +82,7 @@ class MapperService implements MapperServiceInterface
      */
     public function mapToEntity(object $dto, string $entityClass = null): object
     {
+        // Regular DTO mapping
         if ($entityClass === null) {
             $className = str_replace('DTO', '', (new ReflectionClass($dto))->getShortName());
             $entityClass = 'App\\Entity\\' . $className;
@@ -79,7 +96,14 @@ class MapperService implements MapperServiceInterface
             $propertyName = $property->getName();
 
             try {
-                if ($entityReflection->hasProperty($propertyName)) {
+                // If the property is an array of ids, map it to a collection of entities
+                if (is_array($this->propertyAccessor->getValue($dto, $propertyName)) && str_ends_with($propertyName, 'Ids')) {
+                    $entityProperty = $entityReflection->getProperty(str_replace('Ids', '', $propertyName));
+                    $associatedEntities = $this->getEntitiesFromIds($entityProperty->getDocComment(), $this->propertyAccessor->getValue($dto, $propertyName));
+                    $this->propertyAccessor->setValue($entity, str_replace('Ids', '', $propertyName), $associatedEntities);
+                }
+                // Regular property mapping
+                elseif ($entityReflection->hasProperty($propertyName)) {
                     $value = $this->propertyAccessor->getValue($dto, $propertyName);
 
                     $entityPropertyReflection = $entityReflection->getProperty($propertyName);
@@ -91,12 +115,20 @@ class MapperService implements MapperServiceInterface
                     }
 
                     $this->propertyAccessor->setValue($entity, $propertyName, $value);
-                } elseif (str_contains($propertyName, 'Id')) {
+                }
+                // If the property is an object id, map it to an entity
+                elseif (str_ends_with($propertyName, 'Id')) {
                     $entityProperty = str_replace('Id', '', $propertyName);
                     if ($entityReflection->hasProperty($entityProperty)) {
                         $associatedEntityClass = $entityReflection->getProperty($entityProperty)->getType()->getName();
-                        $associatedEntity = $this->entityManager->find($associatedEntityClass, $this->propertyAccessor->getValue($dto, $propertyName));
-                        $this->propertyAccessor->setValue($entity, $entityProperty, $associatedEntity);
+                        $associatedEntityId = $this->propertyAccessor->getValue($dto, $propertyName);
+                        if ($associatedEntityId === null) {
+                            $this->propertyAccessor->setValue($entity, $entityProperty, null);
+                        }
+                        else {
+                            $associatedEntity = $this->entityManager->find($associatedEntityClass, $associatedEntityId);
+                            $this->propertyAccessor->setValue($entity, $entityProperty, $associatedEntity);
+                        }
                     }
                 }
             } catch (NoSuchPropertyException $e) {
@@ -105,5 +137,97 @@ class MapperService implements MapperServiceInterface
         }
 
         return $entity;
+    }
+
+    /**
+     * Safely get the value of a property, checking if it is initialized.
+     * @throws ReflectionException
+     */
+    private function getPropertyValueSafely(object $entity, string $propertyName)
+    {
+        $property = (new ReflectionClass($entity))->getProperty($propertyName);
+        $property->setAccessible(true);
+
+        if (!$property->isInitialized($entity)) {
+            return null;
+        }
+
+        return $property->getValue($entity);
+    }
+
+    /**
+     * Get entity objects from repository based on ids.
+     * @param string|null $docBlock
+     * @param array $ids
+     * @return array
+     */
+    private function getEntitiesFromIds(?string $docBlock, array $ids): array
+    {
+        $entityClass = $this->getEntityClassFromDocBlock($docBlock);
+        $repository = $this->entityManager->getRepository($entityClass);
+        return $repository->findBy(['id' => $ids]);
+    }
+
+    /**
+     * Extract ids from a collection or array of entities.
+     * @param Collection|array $collectionOrArray
+     * @return array
+     */
+    private function getIdsFromCollectionOrArray(Collection|array $collectionOrArray): array
+    {
+        $ids = [];
+
+        foreach ($collectionOrArray as $item) {
+            $ids[] = $item->getId();
+        }
+
+        return $ids;
+    }
+
+
+    /**
+     * Get entity class from docblock type hint.
+     * @param string|null $docComment
+     * @return string|null
+     */
+    private function getEntityClassFromDocBlock(?string $docComment): ?string
+    {
+        if ($docComment === null) {
+            return null;
+        }
+
+        preg_match('/@var\s+Collection<\s*[^,]+,\s*([^>]+)>/', $docComment, $matches);
+        if (!isset($matches[1])) {
+            return null;
+        }
+
+        $typeHint = "App\\Entity\\$matches[1]";
+        if (class_exists($typeHint)) {
+            return $typeHint;
+        }
+
+        return null;
+    }
+
+    /**
+     * Map a collection of entities to an array of DTOs.
+     * @param Collection $collection
+     * @param string $entityClass
+     * @return array
+     * @throws ReflectionException
+     */
+    private function mapToDTOArray(Collection $collection, string $entityClass): array
+    {
+        $dtos = [];
+
+        foreach ($collection as $entity) {
+            $dtoClass = str_replace('Entity', 'DTO', $entityClass) . 'DTO';
+            if (!class_exists($dtoClass)) {
+                $dtoClass = str_replace('Entity', 'DTO', $entityClass) . 'ResponseDTO';
+            }
+            $dtos[] = $this->mapToDTO($entity, $dtoClass);
+        }
+
+        return $dtos;
     }
 }

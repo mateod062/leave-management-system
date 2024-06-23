@@ -15,6 +15,8 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use ReflectionException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class UserPersistenceService implements UserPersistenceServiceInterface
@@ -25,7 +27,8 @@ class UserPersistenceService implements UserPersistenceServiceInterface
         private readonly UserRepository $userRepository,
         private readonly MapperService $mapperService,
         private readonly LeaveBalanceService $leaveBalanceService,
-        private readonly EventDispatcherInterface $eventDispatcher
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly UserPasswordHasherInterface $passwordHasher
     ){}
 
     /**
@@ -77,6 +80,7 @@ class UserPersistenceService implements UserPersistenceServiceInterface
     {
         $user = $this->mapperService->mapToEntity($userCreationDTO, User::class);
         $user->setRole($role);
+        $user->setPassword($this->passwordHasher->hashPassword($user, $userCreationDTO->getPassword()));
 
         $userDTO = $this->mapperService->mapToDTO($this->userRepository->save($user));
 
@@ -97,8 +101,9 @@ class UserPersistenceService implements UserPersistenceServiceInterface
 
         $user->setUsername($userDTO->getUsername());
         $user->setEmail($userDTO->getEmail());
-        $user->setPassword($userDTO->getPassword());
         $user->setRole(UserRole::tryFrom($userDTO->getRole()));
+
+        $this->userRepository->upgradePassword($user, $userDTO->getPassword());
 
         $this->userRepository->save($user);
 

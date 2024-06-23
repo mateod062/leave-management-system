@@ -29,15 +29,23 @@ class PageController extends AbstractController
     public function adminDashboard(): Response
     {
         $user = $this->authenticationService->getAuthenticatedUser();
+        $users = $this->userQueryService->getUsers();
         $leaveRequests = $this->leaveRequestQueryService->getLeaveRequests(new LeaveRequestFilterDTO());
 
+        $displayLeaveRequests = [];
+
         foreach ($leaveRequests as $leaveRequest) {
-            $leaveRequest['user'] = $this->userQueryService->getUserById($leaveRequest->getUserId());
+            $user = $this->userQueryService->getUserById($leaveRequest->getUserId());
+            $displayLeaveRequests[] = [
+                'request' => $leaveRequest,
+                'user' => $user
+            ];
         }
 
         return $this->render('admin/dashboard.html.twig', [
             'user' => $user,
-            'leave_requests' => $leaveRequests
+            'users' => $users,
+            'leave_requests' => $displayLeaveRequests
         ]);
     }
 

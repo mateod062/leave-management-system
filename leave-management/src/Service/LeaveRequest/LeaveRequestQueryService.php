@@ -12,8 +12,6 @@ use App\Service\LeaveRequest\Interface\LeaveRequestQueryServiceInterface;
 use App\Service\Mapper\MapperService;
 use DateTime;
 use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\OptimisticLockException;
 use ReflectionException;
 
 class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
@@ -76,6 +74,9 @@ class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
         return $this->mapperService->mapToDTO($leaveRequest);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function getLeaveRequests(LeaveRequestFilterDTO $filter): array
     {
         $criteria = [];
@@ -96,9 +97,12 @@ class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
             $criteria['endDate'] = $filter->getEndDate();
         }
 
-        return $this->leaveRequestRepository->findBy($criteria);
+        return array_map(fn($leaveRequest) => $this->mapperService->mapToDTO($leaveRequest), $this->leaveRequestRepository->findBy($criteria));
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function getLeaveHistory(int $userId): array
     {
         return $this->getLeaveRequests(new LeaveRequestFilterDTO($userId));

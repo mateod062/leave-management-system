@@ -43,5 +43,6 @@ services:
             - { name: 'kernel.event_subscriber' }
 
     App\Validator\Constraints\ValidLeaveRequestDatesValidator:
-        tags: [validator.constraint_validator]
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'valid_leave_request_dates_validator' }
 

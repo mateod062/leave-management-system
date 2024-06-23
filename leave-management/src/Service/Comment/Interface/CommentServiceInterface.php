@@ -2,7 +2,8 @@
 
 namespace App\Service\Comment\Interface;
 
-use App\DTO\CommentDTO;
+use App\DTO\CommentCreationDTO;
+use App\DTO\CommentResponseDTO;
 
 interface CommentServiceInterface
 {
@@ -25,18 +26,19 @@ interface CommentServiceInterface
     /**
      * Add a new comment
      *
-     * @param CommentDTO $comment
-     * @return CommentDTO
+     * @param CommentCreationDTO $comment
+     * @return CommentResponseDTO
      */
-    public function addComment(CommentDTO $comment): CommentDTO;
+    public function addComment(CommentCreationDTO $comment): CommentResponseDTO;
 
     /**
      * Update a comment
      *
-     * @param CommentDTO $comment
-     * @return CommentDTO
+     * @param int $id
+     * @param CommentCreationDTO $comment
+     * @return CommentResponseDTO
      */
-    public function updateComment(CommentDTO $comment): CommentDTO;
+    public function updateComment(int $id, CommentCreationDTO $comment): CommentResponseDTO;
 
     /**
      * Delete a comment
