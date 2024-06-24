@@ -12,17 +12,17 @@
         <a href="{{ path('notifications') }}">Notifications</a>
         <a href="{{ path('leave_history') }}">Leave History</a>
         <a href="#approve_leave_requests">Approve Requests</a>
-        <a href="{{ path('logout') }}">Logout</a>
+        <a href="{{ path('app_logout') }}">Logout</a>
     </div>
     <div class="leave-balance">
-        <h2>Leave Balance: {{ leave_balance }} days</h2>
+        <h2>Leave Balance: {{ user.leaveBalance }} days</h2>
     </div>
     <div class="team-members">
         <h2>Teams</h2>
         {% for team in teams %}
             <div class="team">
                 <h3>{{ team.name }}</h3>
-                <button onclick="{{ path('team_calendar', {'teamId': team.id}) }}">Team Calendar</button>
+                <button onclick="{{ path('team_calendar', {'id': team.id}) }}">Team Calendar</button>
                 {% for member in team.members %}
                     <div class="team-member">
                         <span>{{ member.username }} Leave Balance: {{ member.leaveBalance }}</span>
@@ -33,12 +33,12 @@
     </div>
     <div class="leave-requests" id="approve_leave_requests">
         <h2>Leave Requests</h2>
-        {% for request in leave_requests %}
+        {% for leave_request in leave_requests %}
             <div class="leave-request">
-                <span>{{ request.user.username }} | {{ request.startDate|date('d/m/Y') }} - {{ request.endDate|date('d/m/Y') }}</span>
-                <a href="{{ path('approve_leave_request', {'id': request.id}) }}">Approve</a>
-                <a href="{{ path('reject_leave_request', {'id': request.id}) }}">Reject</a>
-                <a href="{{ path('leave_request_details', {'id': request.id}) }}">Details</a>
+                <span>{{ leave_request.request.user.username }} | {{ leave_request.request.startDate|date('d/m/Y') }} - {{ leave_request.endDate|date('d/m/Y') }}</span>
+                <a href="{{ path('approve_leave_request', {'id': leave_request.request.id}) }}">Approve</a>
+                <a href="{{ path('reject_leave_request', {'id': leave_request.request.id}) }}">Reject</a>
+                <a href="{{ path('leave_request_details', {'id': leave_request.request.id}) }}">Details</a>
             </div>
         {% endfor %}
     </div>
@@ -51,20 +51,8 @@
             </div>
         {% endfor %}
     </div>
-    <div class="send-leave-request">
-        <h2>Send Leave Request</h2>
-        <form action="{{ path('send_leave_request') }}" method="post">
-            <label for="start_date">Start date</label>
-            <input type="date" id="start_date" name="start_date" required>
-
-            <label for="end_date">End date</label>
-            <input type="date" id="end_date" name="end_date" required>
-
-            <label for="reason">Reason</label>
-            <textarea id="reason" name="reason" required></textarea>
-
-            <button type="submit">Send</button>
-        </form>
+    <div id="send_leave_request">
+        {% include 'leave_request/create.html.twig' %}
     </div>
 </div>
 </body>

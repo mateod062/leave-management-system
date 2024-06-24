@@ -6,12 +6,16 @@ use App\DTO\LeaveRequestCalendarDTO;
 use App\DTO\LeaveRequestDayDTO;
 use App\DTO\LeaveRequestDTO;
 use App\DTO\LeaveRequestFilterDTO;
+use App\Entity\UserRole;
 use App\Repository\LeaveRequestRepository;
 use App\Repository\UserRepository;
+use App\Service\Auth\Interface\AuthenticationServiceInterface;
 use App\Service\LeaveRequest\Interface\LeaveRequestQueryServiceInterface;
 use App\Service\Mapper\MapperService;
+use App\Service\Team\Interface\TeamServiceInterface;
 use DateTime;
 use Doctrine\ORM\EntityNotFoundException;
+use LogicException;
 use ReflectionException;
 
 class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
@@ -21,6 +25,8 @@ class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
     public function __construct(
         private readonly LeaveRequestRepository $leaveRequestRepository,
         private readonly UserRepository         $userRepository,
+        private readonly TeamServiceInterface   $teamService,
+        private readonly AuthenticationServiceInterface $authenticationService,
         private readonly MapperService          $mapperService
     ) {}
 
@@ -73,6 +79,35 @@ class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
 
         return $this->mapperService->mapToDTO($leaveRequest);
     }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function getLeaveRequestsForApprover(): array
+    {
+        $user = $this->authenticationService->getAuthenticatedUser();
+        $teams = [];
+
+        if ($user->getRole() === UserRole::ROLE_TEAM_LEAD->value) {
+            $teams[] = $this->teamService->getLeadingTeam($user->getId());
+        }
+        elseif ($user->getRole() === UserRole::ROLE_PROJECT_MANAGER->value) {
+            $teams = $this->teamService->getManagedTeams($user->getId());
+        }
+        else {
+            throw new LogicException('User is not an approver');
+        }
+
+        $leaveRequests = [];
+
+        foreach ($teams as $team) {
+            $users = array_merge($leaveRequests, $this->userRepository->findBy(['team' => $team->getId()]));
+            $leaveRequests = array_merge($leaveRequests, $this->leaveRequestRepository->findBy(['user' => $users, 'status' => 'pending']));
+        }
+
+        return array_map(fn($leaveRequest) => $this->mapperService->mapToDTO($leaveRequest), $leaveRequests);
+    }
+
 
     /**
      * @throws ReflectionException

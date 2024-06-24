@@ -28,6 +28,13 @@ interface LeaveRequestQueryServiceInterface
     public function getLeaveRequests(LeaveRequestFilterDTO $filter): array;
 
     /**
+     * Get leave requests for approver
+     *
+     * @return array
+     */
+    public function getLeaveRequestsForApprover(): array;
+
+    /**
      * Get overlapping approved leave requests
      *
      * @param int $userId

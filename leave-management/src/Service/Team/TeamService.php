@@ -28,6 +28,27 @@ class TeamService implements TeamServiceInterface
         private readonly LeaveBalanceService $leaveBalanceService
     ){}
 
+    /**
+     * @throws ReflectionException
+     */
+    public function getManagedTeams(int $projectManagerId): array
+    {
+        return array_map(fn(Team $team) => $this->mapperService->mapToDTO($team, TeamResponseDTO::class), $this->teamRepository->findBy(['projectManager' => $projectManagerId]));
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function getLeadingTeam(int $teamLeadId): TeamResponseDTO
+    {
+        $team = $this->teamRepository->findOneBy(['teamLead' => $teamLeadId]);
+
+        if (!$team) {
+            throw new EntityNotFoundException(sprintf('Team with id %s not found', $teamLeadId));
+        }
+
+        return $this->mapperService->mapToDTO($team, TeamResponseDTO::class);
+    }
 
     /**
      * @throws ReflectionException

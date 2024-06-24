@@ -56,9 +56,9 @@ class UserFixtures extends Fixture
         $this->addReference(self::ADMIN_REFERENCE, $createdAdmin);
 
         $projectManager = new UserCreationDTO(
-            username: $uniqueValue([$faker, 'userName'], $this->usernames),
-            email: $uniqueValue([$faker, 'email'], $this->emails),
-            password: $faker->password,
+            username: 'project',
+            email: 'project@gmail.com',
+            password: 'project',
 
         );
 
@@ -67,9 +67,9 @@ class UserFixtures extends Fixture
         $this->addReference(self::PROJECT_MANAGER_REFERENCE, $createdProjectManager);
 
         $teamLead = new UserCreationDTO(
-            username: $uniqueValue([$faker, 'userName'], $this->usernames),
-            email: $uniqueValue([$faker, 'email'], $this->emails),
-            password: $faker->password,
+            username: 'team',
+            email: 'team@gmail.com',
+            password: 'team',
         );
 
         $this->userPersistenceService->createTeamLead($teamLead);

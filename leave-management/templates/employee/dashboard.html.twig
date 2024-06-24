@@ -13,7 +13,7 @@
             <a href="{{ path('notifications') }}">Notifications</a>
             <a href="{{ path('leave_history') }}">Leave History</a>
             <a href="{{ path('team_calendar', {'teamId': user.teamId}) }}">Team Calendar</a>
-            <a href="{{ path('logout') }}">Logout</a>
+            <a href="{{ path('app_logout') }}">Logout</a>
         </div>
         <div class="leave-balance">
             <h2>Leave Balance: {{ user.leaveBalance }} {% if user.leaveBalance != 1 'days' else 'day' %}</h2>
@@ -28,7 +28,7 @@
             {% endfor %}
         </div>
         <div id="send_leave_request">
-            {% include 'create.html.twig' %}
+            {% include 'leave_requestcreate.html.twig' %}
         </div>
     </div>
 </body>

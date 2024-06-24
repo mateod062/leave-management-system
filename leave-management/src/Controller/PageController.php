@@ -2,13 +2,20 @@
 
 namespace App\Controller;
 
+use App\DTO\LeaveRequestDTO;
 use App\DTO\LeaveRequestFilterDTO;
+use App\Form\LeaveRequestCreationType;
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
 use App\Service\Comment\Interface\CommentServiceInterface;
+use App\Service\LeaveRequest\Interface\LeaveRequestPersistenceServiceInterface;
 use App\Service\LeaveRequest\Interface\LeaveRequestQueryServiceInterface;
 use App\Service\Notification\Interface\NotificationServiceInterface;
+use App\Service\Team\Interface\TeamServiceInterface;
 use App\Service\User\Interface\UserQueryServiceInterface;
 use DateTime;
+use Doctrine\ORM\Exception\ORMException;
+use Exception;
+use ReflectionException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +26,9 @@ class PageController extends AbstractController
     public function __construct(
         private readonly AuthenticationServiceInterface $authenticationService,
         private readonly LeaveRequestQueryServiceInterface $leaveRequestQueryService,
+        private readonly LeaveRequestPersistenceServiceInterface $leaveRequestPersistenceService,
         private readonly NotificationServiceInterface $notificationService,
+        private readonly TeamServiceInterface $teamService,
         private readonly CommentServiceInterface $commentService,
         private readonly UserQueryServiceInterface $userQueryService
     ) {}
@@ -49,21 +58,57 @@ class PageController extends AbstractController
         ]);
     }
 
-    #[Route('/project-manager/dashboard', name: 'project_manager_dashboard', methods: ['GET'])]
-    public function projectManagerDashboard(): Response
+    #[Route('/project-manager/dashboard', name: 'project_manager_dashboard', methods: ['GET', 'POST'])]
+    public function projectManagerDashboard(Request $request): Response
     {
         $user = $this->authenticationService->getAuthenticatedUser();
-        $leaveRequests = $this->leaveRequestQueryService->getLeaveRequests(new LeaveRequestFilterDTO(
+        $myLeaveRequests = $this->leaveRequestQueryService->getLeaveRequests(new LeaveRequestFilterDTO(
             userId: $user->getId()
         ));
+        $leaveRequests = $this->leaveRequestQueryService->getLeaveRequestsForApprover();
+        $teams = $this->teamService->getManagedTeams($user->getId());
+
+        $displayLeaveRequests = [];
 
         foreach ($leaveRequests as $leaveRequest) {
-            $leaveRequest['user'] = $this->userQueryService->getUserById($leaveRequest->getUserId());
+            $user = $this->userQueryService->getUserById($leaveRequest->getUserId());
+            $displayLeaveRequests[] = [
+                'request' => $leaveRequest,
+                'user' => $user
+            ];
         }
+
+        $form = $this->createForm(LeaveRequestCreationType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            try {
+                $this->leaveRequestPersistenceService->createLeaveRequest(
+                    new LeaveRequestDTO(
+                        userId: $user->getId(),
+                        startDate: new \DateTime($data['startDate']),
+                        endDate: new \DateTime($data['endDate']),
+                        reason: $data['reason']
+                    )
+                );
+
+                return $this->redirectToRoute('project_manager_dashboard');
+            } catch (ReflectionException | ORMException $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            } catch (Exception $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
 
         return $this->render('project_manager/dashboard.html.twig', [
             'user' => $user,
-            'leave_requests' => $leaveRequests
+            'my_requests' => $myLeaveRequests,
+            'leave_requests' => $displayLeaveRequests,
+            'teams' => $teams,
+            'form' => $form->createView()
             ]);
     }
 
@@ -90,10 +135,6 @@ class PageController extends AbstractController
         $leaveRequests = $this->leaveRequestQueryService->getLeaveRequests(new LeaveRequestFilterDTO(
             userId: $user->getId()
         ));
-
-        foreach ($leaveRequests as $leaveRequest) {
-            $leaveRequest['user'] = $this->userQueryService->getUserById($leaveRequest->getUserId());
-        }
 
         return $this->render('employee/dashboard.html.twig', [
             'user' => $user,

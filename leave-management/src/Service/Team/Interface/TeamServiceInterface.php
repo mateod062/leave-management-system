@@ -9,6 +9,24 @@ use App\DTO\UserResponseDTO;
 interface TeamServiceInterface
 {
     /**
+     * Get the leading team of a team lead
+     *
+     * @param int $teamLeadId
+     *
+     * @return TeamResponseDTO
+     */
+    public function getLeadingTeam(int $teamLeadId): TeamResponseDTO;
+
+    /**
+     * Get all teams managed by a project manager
+     *
+     * @param int $projectManagerId
+     *
+     * @return array
+     */
+    public function getManagedTeams(int $projectManagerId): array;
+
+    /**
      * Get all team members
      *
      * @param int $teamId
@@ -22,7 +40,7 @@ interface TeamServiceInterface
      *
      * @param int $teamId
      *
-     * @return \App\DTO\UserResponseDTO
+     * @return UserResponseDTO
      */
     public function getProjectManager(int $teamId): UserResponseDTO;
 
