@@ -63,11 +63,11 @@ class LeaveRequestCreationType extends AbstractType
 
             $user = $this->authenticationService->getAuthenticatedUser();
 
-            if (!$data['startDate'] || !$data['endDate']) {
+            if (!$data->getStartDate() || !$data->getEndDate()) {
                 return;
             }
 
-            $overlappingRequests = $this->leaveRequestQueryService->getOverlappingLeaveRequests($user->getId(), $data['startDate'], $data['endDate']);
+            $overlappingRequests = $this->leaveRequestQueryService->getOverlappingLeaveRequests($user->getId(), $data->getStartDate(), $data->getEndDate());
             if (count($overlappingRequests) > 0) {
                 $form->addError(new FormError('The requested leave interval overlaps with another approved leave request.'));
             }

@@ -20,6 +20,7 @@ class UserFixtures extends Fixture
     public const TEAM_LEAD_REFERENCE = 'team-lead';
     public const PROJECT_MANAGER_REFERENCE = 'project-manager';
     public const ADMIN_REFERENCE = 'admin';
+    public const EMPLOYEE_REFERENCE = 'employee';
 
     public function __construct(
         private readonly UserPersistenceService $userPersistenceService,
@@ -58,8 +59,7 @@ class UserFixtures extends Fixture
         $projectManager = new UserCreationDTO(
             username: 'project',
             email: 'project@gmail.com',
-            password: 'project',
-
+            password: 'project'
         );
 
         $this->userPersistenceService->createProjectManager($projectManager);
@@ -75,6 +75,16 @@ class UserFixtures extends Fixture
         $this->userPersistenceService->createTeamLead($teamLead);
         $createdTeamLead = $this->userRepository->findOneBy(['email' => $teamLead->getEmail()]);
         $this->addReference(self::TEAM_LEAD_REFERENCE, $createdTeamLead);
+
+        $employee = new UserCreationDTO(
+            username: 'employee',
+            email: 'employee@gmail.com',
+            password: 'employee',
+        );
+
+        $this->userPersistenceService->createEmployee($employee);
+        $createdEmployee = $this->userRepository->findOneBy(['email' => $employee->getEmail()]);
+        $this->addReference(self::EMPLOYEE_REFERENCE, $createdEmployee);
 
         for ($i = 0; $i < 10; $i++) {
             $employee = new UserCreationDTO(

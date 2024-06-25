@@ -17,12 +17,12 @@ class ValidLeaveRequestDatesValidator extends ConstraintValidator
 
     public function validate(mixed $value, Constraint $constraint): void
     {
-        if (!$value || !$value['startDate'] || !$value['endDate']) {
+        if (!$value || !$value->getStartDate() || !$value->getEndDate()) {
             return;
         }
 
-        $startDate = $value['startDate'];
-        $endDate = $value['endDate'];
+        $startDate = $value->getStartDate();
+        $endDate = $value->getEndDate();
 
         $start = Carbon::instance($startDate);
         $end = Carbon::instance($endDate);

@@ -31,6 +31,20 @@ class TeamService implements TeamServiceInterface
     /**
      * @throws ReflectionException
      */
+    public function getTeamById(int $teamId): TeamResponseDTO
+    {
+        $team = $this->teamRepository->find($teamId);
+
+        if (!$team) {
+            throw new EntityNotFoundException(sprintf('Team with id %s not found', $teamId));
+        }
+
+        return $this->mapperService->mapToDTO($team, TeamResponseDTO::class);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
     public function getManagedTeams(int $projectManagerId): array
     {
         return array_map(fn(Team $team) => $this->mapperService->mapToDTO($team, TeamResponseDTO::class), $this->teamRepository->findBy(['projectManager' => $projectManagerId]));
@@ -44,7 +58,7 @@ class TeamService implements TeamServiceInterface
         $team = $this->teamRepository->findOneBy(['teamLead' => $teamLeadId]);
 
         if (!$team) {
-            throw new EntityNotFoundException(sprintf('Team with id %s not found', $teamLeadId));
+            throw new EntityNotFoundException(sprintf('Team with team lead id %s not found', $teamLeadId));
         }
 
         return $this->mapperService->mapToDTO($team, TeamResponseDTO::class);
@@ -69,7 +83,7 @@ class TeamService implements TeamServiceInterface
      */
     public function getProjectManager(int $teamId): UserResponseDTO
     {
-        $projectManager = $this->userRepository->findOneBy(['team' => $teamId, 'role' => UserRole::ROLE_PROJECT_MANAGER->value]);
+        $projectManager = $this->userRepository->findOneBy(['team' => $teamId, 'role' => UserRole::ROLE_PROJECT_MANAGER]);
 
         if (!$projectManager) {
             throw new EntityNotFoundException(sprintf('Project Manager for team with id %s not found', $teamId));
@@ -86,7 +100,7 @@ class TeamService implements TeamServiceInterface
      */
     public function getTeamLead(int $teamId): UserResponseDTO
     {
-        $teamLead = $this->userRepository->findOneBy(['team' => $teamId, 'role' => UserRole::ROLE_TEAM_LEAD->value]);
+        $teamLead = $this->userRepository->findOneBy(['team' => $teamId, 'role' => UserRole::ROLE_TEAM_LEAD]);
 
         if (!$teamLead) {
             throw new EntityNotFoundException(sprintf('Team Lead for team with id %s not found', $teamId));

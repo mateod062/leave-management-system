@@ -9,6 +9,15 @@ use App\DTO\UserResponseDTO;
 interface TeamServiceInterface
 {
     /**
+     * Get a team by its id
+     *
+     * @param int $teamId
+     *
+     * @return TeamResponseDTO
+     */
+    public function getTeamById(int $teamId): TeamResponseDTO;
+
+    /**
      * Get the leading team of a team lead
      *
      * @param int $teamLeadId

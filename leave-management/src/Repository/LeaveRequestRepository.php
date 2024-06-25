@@ -60,7 +60,7 @@ class LeaveRequestRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('lr')
             ->where('lr.user = :user')
-            ->andWhere('lr.status = approved')
+            ->andWhere('lr.status = \'approved\'')
             ->andWhere('(
             (lr.startDate <= :endDate AND lr.endDate >= :startDate)
             )')

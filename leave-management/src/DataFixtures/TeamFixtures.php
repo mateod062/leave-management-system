@@ -38,12 +38,15 @@ class TeamFixtures extends Fixture implements DependentFixtureInterface
             name: $faker->company,
             membersIds: [
                 $this->getReference(UserFixtures::TEAM_LEAD_REFERENCE)->getId(),
-                $this->getReference(UserFixtures::PROJECT_MANAGER_REFERENCE)->getId()
+                $this->getReference(UserFixtures::PROJECT_MANAGER_REFERENCE)->getId(),
+                $this->getReference(UserFixtures::EMPLOYEE_REFERENCE)->getId()
             ],
             teamLeadId: $this->getReference(UserFixtures::TEAM_LEAD_REFERENCE)->getId(),
             projectManagerId: $this->getReference(UserFixtures::PROJECT_MANAGER_REFERENCE)->getId()
         );
 
         $this->teamService->createTeam($teamDTO);
+        dump($this->teamService->getManagedTeams($this->getReference(UserFixtures::PROJECT_MANAGER_REFERENCE)->getId()));
+        dump($this->teamService->getLeadingTeam($this->getReference(UserFixtures::TEAM_LEAD_REFERENCE)->getId()));
     }
 }

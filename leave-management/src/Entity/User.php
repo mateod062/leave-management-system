@@ -60,7 +60,10 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     public function setLeadingTeam(?Team $leadingTeam): void
     {
-        $this->leadingTeam = $leadingTeam;
+        if ($this->leadingTeam !== $leadingTeam) {
+            $this->leadingTeam = $leadingTeam;
+            $leadingTeam?->setTeamLead($this);
+        }
     }
 
     public function getManagedTeams(): Collection
@@ -70,7 +73,17 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     public function setManagedTeams(Collection $managedTeams): void
     {
+        foreach ($this->managedTeams as $managedTeam) {
+            if (!$managedTeams->contains($managedTeam)) {
+                $managedTeam->setProjectManager(null);
+            }
+        }
+
         $this->managedTeams = $managedTeams;
+
+        foreach ($managedTeams as $managedTeam) {
+            $managedTeam->setProjectManager($this);
+        }
     }
 
     public function getTeam(): ?Team
@@ -80,7 +93,10 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     public function setTeam(?Team $team): void
     {
-        $this->team = $team;
+        if ($this->team !== $team) {
+            $this->team = $team;
+            $team?->addMember($this);
+        }
     }
 
     public function getId(): ?int

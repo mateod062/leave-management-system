@@ -17,6 +17,9 @@ use Doctrine\ORM\Exception\ORMException;
 use Exception;
 use ReflectionException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -87,10 +90,10 @@ class PageController extends AbstractController
             try {
                 $this->leaveRequestPersistenceService->createLeaveRequest(
                     new LeaveRequestDTO(
-                        userId: $user->getId(),
-                        startDate: new \DateTime($data['startDate']),
-                        endDate: new \DateTime($data['endDate']),
-                        reason: $data['reason']
+                        userId: $this->authenticationService->getAuthenticatedUser()->getId(),
+                        startDate: $data->getStartDate(),
+                        endDate: $data->getEndDate(),
+                        reason: $data->getReason()
                     )
                 );
 
@@ -102,7 +105,6 @@ class PageController extends AbstractController
             }
         }
 
-
         return $this->render('project_manager/dashboard.html.twig', [
             'user' => $user,
             'my_requests' => $myLeaveRequests,
@@ -112,33 +114,95 @@ class PageController extends AbstractController
             ]);
     }
 
-    #[Route('/team-lead/dashboard', name: 'team_lead_dashboard', methods: ['GET'])]
-    public function teamLeadDashboard(): Response
+    #[Route('/team-lead/dashboard', name: 'team_lead_dashboard', methods: ['GET', 'POST'])]
+    public function teamLeadDashboard(Request $request): Response
     {
         $user = $this->authenticationService->getAuthenticatedUser();
-        $leaveRequests = $this->leaveRequestQueryService->getLeaveRequests(new LeaveRequestFilterDTO());
+        $leaveRequests = $this->leaveRequestQueryService->getLeaveRequestsForApprover();
+        $myLeaveRequests = $this->leaveRequestQueryService->getLeaveRequests(new LeaveRequestFilterDTO(
+            userId: $user->getId()
+        ));
+        $team = $this->teamService->getLeadingTeam($user->getId());
+
+        $displayLeaveRequests = [];
 
         foreach ($leaveRequests as $leaveRequest) {
-            $leaveRequest['user'] = $this->userQueryService->getUserById($leaveRequest->getUserId());
+            $user = $this->userQueryService->getUserById($leaveRequest->getUserId());
+            $displayLeaveRequests[] = [
+                'request' => $leaveRequest,
+                'user' => $user
+            ];
+        }
+
+        $form = $this->createForm(LeaveRequestCreationType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            try {
+                $this->leaveRequestPersistenceService->createLeaveRequest(
+                    new LeaveRequestDTO(
+                        userId: $this->authenticationService->getAuthenticatedUser()->getId(),
+                        startDate: $data->getStartDate(),
+                        endDate: $data->getEndDate(),
+                        reason: $data->getReason()
+                    )
+                );
+
+                return $this->redirectToRoute('team_lead_dashboard');
+            } catch (ReflectionException | ORMException $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            } catch (Exception $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         }
 
         return $this->render('team_lead/dashboard.html.twig', [
             'user' => $user,
-            'leave_requests' => $leaveRequests
+            'leave_requests' => $displayLeaveRequests,
+            'my_requests' => $myLeaveRequests,
+            'team' => $team,
+            'form' => $form->createView()
         ]);
     }
 
-    #[Route('/employee/dashboard', name: 'employee_dashboard', methods: ['GET'])]
-    public function employeeDashboard(): Response
+    #[Route('/employee/dashboard', name: 'employee_dashboard', methods: ['GET', 'POST'])]
+    public function employeeDashboard(Request $request): Response
     {
         $user = $this->authenticationService->getAuthenticatedUser();
         $leaveRequests = $this->leaveRequestQueryService->getLeaveRequests(new LeaveRequestFilterDTO(
             userId: $user->getId()
         ));
 
+        $form = $this->createForm(LeaveRequestCreationType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            try {
+                $this->leaveRequestPersistenceService->createLeaveRequest(
+                    new LeaveRequestDTO(
+                        userId: $this->authenticationService->getAuthenticatedUser()->getId(),
+                        startDate: $data->getStartDate(),
+                        endDate: $data->getEndDate(),
+                        reason: $data->getReason()
+                    )
+                );
+
+                return $this->redirectToRoute('employee_dashboard');
+            } catch (ReflectionException | ORMException $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            } catch (Exception $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
         return $this->render('employee/dashboard.html.twig', [
             'user' => $user,
-            'leave_requests' => $leaveRequests
+            'leave_requests' => $leaveRequests,
+            'form' => $form->createView()
             ]);
     }
 

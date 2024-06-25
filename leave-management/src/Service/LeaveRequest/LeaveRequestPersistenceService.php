@@ -37,10 +37,9 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
     public function createLeaveRequest(LeaveRequestDTO $leaveRequest): LeaveRequestDTO
     {
         $leaveRequestEntity = $this->mapperService->mapToEntity($leaveRequest);
-
         $leaveRequestEntity = $this->leaveRequestRepository->save($leaveRequestEntity);
-        $this->eventDispatcher->dispatch(new LeaveRequestCreatedEvent($leaveRequestEntity), LeaveRequestCreatedEvent::NAME);
 
+        $this->eventDispatcher->dispatch(new LeaveRequestCreatedEvent($leaveRequestEntity), LeaveRequestCreatedEvent::NAME);
         return $this->mapperService->mapToDTO($leaveRequestEntity);
     }
 
@@ -58,7 +57,7 @@ class LeaveRequestPersistenceService implements LeaveRequestPersistenceServiceIn
         $leaveRequest->setStartDate($leaveRequestDTO->getStartDate());
         $leaveRequest->setEndDate($leaveRequestDTO->getEndDate());
         $leaveRequest->setReason($leaveRequestDTO->getReason());
-        $leaveRequest->setStatus($leaveRequestDTO->getStatus());
+        $leaveRequest->setStatus(LeaveStatus::tryFrom($leaveRequestDTO->getStatus()));
         $leaveRequest->setTeamLeaderApproval($leaveRequestDTO->teamLeadApproved());
         $leaveRequest->setProjectManagerApproval($leaveRequestDTO->projectManagerApproved());
         $leaveRequest->setCreatedAt($leaveRequestDTO->getCreatedAt());

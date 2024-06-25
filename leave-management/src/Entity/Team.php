@@ -61,6 +61,7 @@ class Team
     public function setTeamLead(User $teamLead): void
     {
         $this->teamLead = $teamLead;
+        $teamLead->setLeadingTeam($this);
     }
 
     public function getProjectManager(): User
@@ -71,6 +72,7 @@ class Team
     public function setProjectManager(User $projectManager): void
     {
         $this->projectManager = $projectManager;
+        $projectManager->getManagedTeams()->add($this);
     }
 
     public function getMembers(): Collection
@@ -78,9 +80,27 @@ class Team
         return $this->members;
     }
 
+    public function addMember(User $member): void
+    {
+        if (!$this->members->contains($member)) {
+            $this->members[] = $member;
+        }
+        $member->setTeam($this);
+    }
+
     public function setMembers(array $members): void
     {
+        foreach ($this->members as $member) {
+            if (!in_array($member, $members, true)) {
+                $member->setTeam(null);
+            }
+        }
+
         $this->members = new ArrayCollection($members);
+
+        foreach ($members as $member) {
+            $this->addMember($member);
+        }
     }
 
     public function getId(): ?int

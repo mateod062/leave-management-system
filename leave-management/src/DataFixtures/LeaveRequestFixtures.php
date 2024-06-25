@@ -47,7 +47,6 @@ class LeaveRequestFixtures extends Fixture implements DependentFixtureInterface
                     endDate: $faker->dateTimeBetween('now', '+10 days'),
                     reason: $faker->text
                 );
-
                 $this->leaveRequestService->createLeaveRequest($leaveRequestDTO);
             }
         }

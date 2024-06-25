@@ -15,7 +15,13 @@
         <a href="{{ path('app_logout') }}">Logout</a>
     </div>
     <div class="leave-balance">
-        <h2>Leave Balance: {{ user.leaveBalance }} days</h2>
+        <h2>Leave Balance: {{ user.leaveBalance }}
+            {% if user.leaveBalance != 1 %}
+                days
+            {% else %}
+                day
+            {% endif %}
+        </h2>
     </div>
     <div class="team-members">
         <h2>Teams</h2>

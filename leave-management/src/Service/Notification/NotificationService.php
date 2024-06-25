@@ -79,7 +79,6 @@ class NotificationService implements NotificationServiceInterface
             return;
         }
 
-
         $projectManager = $this->teamService->getProjectManager($user->getTeamId());
         $teamLead = $this->teamService->getTeamLead($user->getTeamId());
 

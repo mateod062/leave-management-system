@@ -27,11 +27,15 @@ class UserRoleType extends Type
             return null;
         }
 
-        if (!$value instanceof UserRole) {
-            throw new InvalidArgumentException('Invalid user role');
+        if ($value instanceof UserRole) {
+            return $value->value;
         }
 
-        return $value->value;
+        try {
+            return UserRole::from($value)->value;
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException('Invalid user role');
+        }
     }
 
     public function getName(): string

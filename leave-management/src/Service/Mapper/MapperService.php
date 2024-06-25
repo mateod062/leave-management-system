@@ -111,7 +111,7 @@ class MapperService implements MapperServiceInterface
 
                     if ($entityPropertyType && $entityPropertyType->isBuiltin() === false && enum_exists($entityPropertyType->getName())) {
                         $enumClass = $entityPropertyType->getName();
-                        $value = $enumClass::from($value);
+                        $value = $enumClass::tryFrom($value);
                     }
 
                     $this->propertyAccessor->setValue($entity, $propertyName, $value);
