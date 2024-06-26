@@ -10,7 +10,7 @@
     <h1>Notifications</h1>
     {% for notification in notifications %}
         <div class="notification">
-            <span>{{ notification.date|date('d/m/Y H:i') }}</span>
+            <span>{{ notification.createdAt|date('d/m/Y H:i') }}</span>
             <p>{{ notification.message }}</p>
         </div>
     {% endfor %}

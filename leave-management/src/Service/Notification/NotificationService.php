@@ -36,7 +36,7 @@ class NotificationService implements NotificationServiceInterface
      */
     public function getUserNotifications(): array
     {
-        $notifications = $this->notificationRepository->findBy(['user' => $this->authenticationService->getAuthenticatedUser()]);
+        $notifications = $this->notificationRepository->findBy(['user' => $this->authenticationService->getAuthenticatedUser()->getId()]);
 
         return array_map(fn(Notification $notification) => $this->mapperService->mapToDTO($notification), $notifications);
     }

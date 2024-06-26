@@ -5,6 +5,7 @@ namespace App\Form;
 use App\DTO\CommentCreationDTO;
 use App\DTO\CommentResponseDTO;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -21,22 +22,23 @@ class PostCommentType extends AbstractType
                 'constraints' => [
                     new NotBlank(),
                     new Length(['min' => 5, 'max' => 255])
-                ]
+                ],
+                'label' => 'Post a comment: '
             ])
-            ->add('parentCommentId', TextType::class, [
+            ->add('parentCommentId', HiddenType::class, [
                 'mapped' => false,
                 'required' => false
             ])
             ->add('submit', SubmitType::class, [
-                'label' => 'Post',
-                'attr' => ['class' => 'btn btn-primary']
+                'label' => 'Post'
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => CommentCreationDTO::class
+            'data_class' => CommentCreationDTO::class,
+            'submit_label' => 'Post'
         ]);
     }
 }

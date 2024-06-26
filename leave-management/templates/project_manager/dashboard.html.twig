@@ -28,7 +28,7 @@
         {% for team in teams %}
             <div class="team">
                 <h3>{{ team.name }}</h3>
-                <button onclick="{{ path('team_calendar', {'id': team.id}) }}">Team Calendar</button>
+                {# <button onclick="{{ path('team_calendar', {'id': team.id}) }}">Team Calendar</button> #}
                 {% for member in team.members %}
                     <div class="team-member">
                         <span>{{ member.username }} Leave Balance: {{ member.leaveBalance }}</span>
@@ -41,7 +41,7 @@
         <h2>Leave Requests</h2>
         {% for leave_request in leave_requests %}
             <div class="leave-request">
-                <span>{{ leave_request.request.user.username }} | {{ leave_request.request.startDate|date('d/m/Y') }} - {{ leave_request.endDate|date('d/m/Y') }}</span>
+                <span>{{ leave_request.user.username }} | {{ leave_request.request.startDate|date('d/m/Y') }} - {{ leave_request.request.endDate|date('d/m/Y') }}</span>
                 <a href="{{ path('approve_leave_request', {'id': leave_request.request.id}) }}">Approve</a>
                 <a href="{{ path('reject_leave_request', {'id': leave_request.request.id}) }}">Reject</a>
                 <a href="{{ path('leave_request_details', {'id': leave_request.request.id}) }}">Details</a>

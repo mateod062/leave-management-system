@@ -6,6 +6,7 @@ use App\DTO\LeaveRequestCalendarDTO;
 use App\DTO\LeaveRequestDayDTO;
 use App\DTO\LeaveRequestDTO;
 use App\DTO\LeaveRequestFilterDTO;
+use App\Entity\LeaveStatus;
 use App\Entity\UserRole;
 use App\Repository\LeaveRequestRepository;
 use App\Repository\UserRepository;
@@ -102,7 +103,7 @@ class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
 
         foreach ($teams as $team) {
             $users = array_merge($leaveRequests, $this->userRepository->findBy(['team' => $team->getId()]));
-            $leaveRequests = array_merge($leaveRequests, $this->leaveRequestRepository->findBy(['user' => $users, 'status' => 'pending']));
+            $leaveRequests = array_merge($leaveRequests, $this->leaveRequestRepository->findBy(['user' => $users, 'status' => LeaveStatus::PENDING->value]));
         }
 
         return array_map(fn($leaveRequest) => $this->mapperService->mapToDTO($leaveRequest), $leaveRequests);
@@ -135,11 +136,9 @@ class LeaveRequestQueryService implements LeaveRequestQueryServiceInterface
         return array_map(fn($leaveRequest) => $this->mapperService->mapToDTO($leaveRequest), $this->leaveRequestRepository->findBy($criteria));
     }
 
-    /**
-     * @throws ReflectionException
-     */
+
     public function getLeaveHistory(int $userId): array
     {
-        return $this->getLeaveRequests(new LeaveRequestFilterDTO($userId));
+        return $this->leaveRequestRepository->findBy(['user' => $userId]);
     }
 }

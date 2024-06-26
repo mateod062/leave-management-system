@@ -3,6 +3,7 @@
 namespace App\Service\Mapper;
 
 use App\Entity\Comment;
+use App\Entity\User;
 use App\Service\Mapper\Interface\MapperServiceInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,6 +26,7 @@ class MapperService implements MapperServiceInterface
 
     /**
      * @throws ReflectionException
+     * @throws ORMException
      */
     public function mapToDTO(object $entity, string $dtoClass = null): object
     {
@@ -32,6 +34,9 @@ class MapperService implements MapperServiceInterface
         if ($dtoClass === null) {
             $className = (new ReflectionClass($entity))->getShortName();
             $dtoClass = 'App\\DTO\\' . $className . 'DTO';
+            if (!class_exists($dtoClass)) {
+                $dtoClass = 'App\\DTO\\' . $className . 'ResponseDTO';
+            }
         }
         
         $dto = new $dtoClass();
@@ -41,10 +46,11 @@ class MapperService implements MapperServiceInterface
         foreach ($entityReflection->getProperties() as $property) {
             $propertyName = $property->getName();
 
+            $propertyValue = $this->getPropertyValueSafely($entity, $propertyName);
+
             // If the property is an entity collection, map it to an array of DTOs
-            if ($dtoReflection->hasProperty($propertyName) && $this->propertyAccessor->getValue($entity, $propertyName) instanceof Collection) {
-                $entityClass = $this->getEntityClassFromDocBlock($entityReflection->getProperty($propertyName)->getDocComment());
-                $value = $this->mapToDTOArray($this->propertyAccessor->getValue($entity, $propertyName), $entityClass);
+            if ($dtoReflection->hasProperty($propertyName) && $propertyValue instanceof Collection) {
+                $value = $this->mapToDTOArray($propertyValue, $propertyName);
                 $this->propertyAccessor->setValue($dto, $propertyName, $value);
             }
             // Regular property mapping
@@ -59,15 +65,14 @@ class MapperService implements MapperServiceInterface
             }
             // If the property is an entity, map it to an id
             elseif ($dtoReflection->hasProperty($propertyName . 'Id')) {
-                $associatedEntity = $this->getPropertyValueSafely($entity, $propertyName);
-                if ($associatedEntity) {
-                    $associatedEntityId = $this->propertyAccessor->getValue($associatedEntity, 'id');
+                if ($propertyValue) {
+                    $associatedEntityId = $this->propertyAccessor->getValue($propertyValue, 'id');
                     $this->propertyAccessor->setValue($dto, $propertyName . 'Id', $associatedEntityId);
                 }
             }
             // If the property is an entity collection, map it to an array of ids
             elseif ($dtoReflection->hasProperty($propertyName . 'Ids')) {
-                $value = $this->getIdsFromCollectionOrArray($property->getValue());
+                $value = $this->getIdsFromCollectionOrArray($propertyValue);
                 $this->propertyAccessor->setValue($dto, $propertyName . 'Ids', $value);
             }
         }
@@ -142,14 +147,14 @@ class MapperService implements MapperServiceInterface
     /**
      * Safely get the value of a property, checking if it is initialized.
      * @throws ReflectionException
+     * @throws ORMException
      */
     private function getPropertyValueSafely(object $entity, string $propertyName)
     {
         $property = (new ReflectionClass($entity))->getProperty($propertyName);
-        $property->setAccessible(true);
 
         if (!$property->isInitialized($entity)) {
-            return null;
+            $this->entityManager->refresh($entity);
         }
 
         return $property->getValue($entity);
@@ -212,19 +217,19 @@ class MapperService implements MapperServiceInterface
     /**
      * Map a collection of entities to an array of DTOs.
      * @param Collection $collection
-     * @param string $entityClass
      * @return array
      * @throws ReflectionException
      */
-    private function mapToDTOArray(Collection $collection, string $entityClass): array
+    private function mapToDTOArray(Collection $collection, string $propertyName): array
     {
         $dtos = [];
 
         foreach ($collection as $entity) {
-            $dtoClass = str_replace('Entity', 'DTO', $entityClass) . 'DTO';
+            $dtoClass = 'App\\DTO\\' . (new ReflectionClass($entity))->getShortName() . 'DTO';
             if (!class_exists($dtoClass)) {
-                $dtoClass = str_replace('Entity', 'DTO', $entityClass) . 'ResponseDTO';
+                $dtoClass = 'App\\DTO\\' . (new ReflectionClass($entity))->getShortName() . 'ResponseDTO';
             }
+
             $dtos[] = $this->mapToDTO($entity, $dtoClass);
         }
 

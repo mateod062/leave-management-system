@@ -3,6 +3,9 @@
 namespace App\DataFixtures;
 
 use App\DTO\TeamCreationDTO;
+use App\DTO\TeamResponseDTO;
+use App\Repository\TeamRepository;
+use App\Service\Mapper\Interface\MapperServiceInterface;
 use App\Service\Team\TeamService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -16,6 +19,8 @@ class TeamFixtures extends Fixture implements DependentFixtureInterface
 {
     public function __construct(
         private readonly TeamService $teamService,
+        private readonly TeamRepository $teamRepository,
+        private readonly MapperServiceInterface $mapperService
     ) {}
 
     public function getDependencies(): array
@@ -46,7 +51,5 @@ class TeamFixtures extends Fixture implements DependentFixtureInterface
         );
 
         $this->teamService->createTeam($teamDTO);
-        dump($this->teamService->getManagedTeams($this->getReference(UserFixtures::PROJECT_MANAGER_REFERENCE)->getId()));
-        dump($this->teamService->getLeadingTeam($this->getReference(UserFixtures::TEAM_LEAD_REFERENCE)->getId()));
     }
 }

@@ -4,6 +4,49 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <link rel="stylesheet" href="{{ asset('css/sytle.css') }}">
+    <script>
+        async function approveLeaveRequest(requestId) {
+            try {
+                const response = await fetch(`/leave-requests/approve/${requestId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    alert('Leave request approved');
+                    location.reload();
+                } else {
+                    const data = await response.json();
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while processing the request');
+            }
+        }
+
+        async function rejectLeaveRequest(requestId) {
+            try {
+                const response = await fetch(`/leave-requests/reject/${requestId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    alert('Leave request rejected');
+                    location.reload();
+                } else {
+                    const data = await response.json();
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while processing the request');
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="team-lead-dashboard">
@@ -11,7 +54,8 @@
             <a href="#pending_leave_requests">Leave Requests</a>
             <a href="{{ path('notifications') }}">Notifications</a>
             <a href="{{ path('leave_history') }}">Leave History</a>
-            <a href="{{ path('team_calendar', {'id': team.id}) }}">Team Calendar</a>
+            <p>{{ user.teamId }}</p>
+            {# <a href="{{ path('team_calendar', {'id': user.teamId}) }}">Team Calendar</a> #}
             <a href="#approve_leave_requests">Approve Requests</a>
             <a href="{{ path('app_logout') }}">Logout</a>
         </div>
@@ -39,8 +83,8 @@
             {% for leave_request in leave_requests %}
                 <div class="leave-request">
                     <span>{{ leave_request.user.username }} | {{ leave_request.request.startDate|date('d/m/Y') }} - {{ leave_request.request.endDate|date('d/m/Y') }}</span>
-                    <a href="{{ path('approve_leave_request', {'id': leave_request.request.id}) }}">Approve</a>
-                    <a href="{{ path('reject_leave_request', {'id': leave_request.request.id}) }}">Reject</a>
+                    <a href="javascript:void(0);" onclick="approveLeaveRequest({{ leave_request.request.id }})">Approve</a>
+                    <a href="javascript:void(0);" onclick="rejectLeaveRequest({{ leave_request.request.id }})">Reject</a>
                     <a href="{{ path('leave_request_details', {'id': leave_request.request.id}) }}">Details</a>
                 </div>
             {% endfor %}

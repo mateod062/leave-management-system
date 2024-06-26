@@ -27,9 +27,13 @@ class CommentService implements CommentServiceInterface
 
     ) {}
 
+    /**
+     * @throws ReflectionException
+     */
     public function getComments(int $leaveRequestId): array
     {
-        return $this->commentRepository->findBy(['leaveRequestId' => $leaveRequestId]);
+        $comments = $this->commentRepository->findBy(['leaveRequest' => $leaveRequestId]);
+        return array_map(fn($comment) => $this->mapperService->mapToDTO($comment), $comments);
     }
 
     /**
@@ -67,12 +71,14 @@ class CommentService implements CommentServiceInterface
 
     /**
      * @throws ReflectionException
+     * @throws ORMException
      */
     public function updateComment(int $id, CommentCreationDTO $comment): CommentResponseDTO
     {
         $commentEntity = $this->commentRepository->find($id);
+
         if ($commentEntity === null) {
-            throw new EntityNotFoundException(sprintf('%s with id %s not found', self::ENTITY, $comment->getId()));
+            throw new EntityNotFoundException(sprintf('%s with id %s not found', self::ENTITY, $id));
         }
         $commentEntity->setMessage($comment->getMessage());
         $commentEntity->setCreatedAt($comment->getCreatedAt());
@@ -89,8 +95,12 @@ class CommentService implements CommentServiceInterface
         $this->commentRepository->delete($comment);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function getReplies(int $commentId): array
     {
-        return $this->commentRepository->findBy(['parentCommentId' => $commentId]);
+        $replies = $this->commentRepository->findBy(['parentComment' => $commentId]);
+        return array_map(fn($comment) => $this->mapperService->mapToDTO($comment), $replies);
     }
 }

@@ -19,7 +19,7 @@ class NotificationController extends AbstractController
         private readonly NotificationServiceInterface $notificationService,
     ) {}
 
-    #[Route('/notifications', name: 'get_notifications', methods: ['GET'])]
+    /*#[Route('/notifications', name: 'get_notifications', methods: ['GET'])]
     public function getNotifications(): JsonResponse
     {
         try {
@@ -29,7 +29,7 @@ class NotificationController extends AbstractController
         } catch (Exception $e) {
             return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
+    }*/
 
     #[Route('/notifications', name: 'clear_notifications', methods: ['DELETE'])]
     public function clearNotifications(): JsonResponse

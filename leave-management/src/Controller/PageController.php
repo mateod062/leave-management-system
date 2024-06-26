@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\DTO\CommentCreationDTO;
 use App\DTO\LeaveRequestDTO;
 use App\DTO\LeaveRequestFilterDTO;
 use App\Form\LeaveRequestCreationType;
+use App\Form\PostCommentType;
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
 use App\Service\Comment\Interface\CommentServiceInterface;
 use App\Service\LeaveRequest\Interface\LeaveRequestPersistenceServiceInterface;
@@ -13,7 +15,9 @@ use App\Service\Notification\Interface\NotificationServiceInterface;
 use App\Service\Team\Interface\TeamServiceInterface;
 use App\Service\User\Interface\UserQueryServiceInterface;
 use DateTime;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Exception;
 use ReflectionException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -61,7 +65,7 @@ class PageController extends AbstractController
         ]);
     }
 
-    #[Route('/project-manager/dashboard', name: 'project_manager_dashboard', methods: ['GET', 'POST'])]
+    #[Route('/project-manager/dashboard', name: 'project_manager_dashboard', methods: ['GET', 'POST', 'PUT'])]
     public function projectManagerDashboard(Request $request): Response
     {
         $user = $this->authenticationService->getAuthenticatedUser();
@@ -114,7 +118,7 @@ class PageController extends AbstractController
             ]);
     }
 
-    #[Route('/team-lead/dashboard', name: 'team_lead_dashboard', methods: ['GET', 'POST'])]
+    #[Route('/team-lead/dashboard', name: 'team_lead_dashboard', methods: ['GET', 'POST', 'PUT'])]
     public function teamLeadDashboard(Request $request): Response
     {
         $user = $this->authenticationService->getAuthenticatedUser();
@@ -206,30 +210,54 @@ class PageController extends AbstractController
             ]);
     }
 
-    #[Route('/leave-request/{id}', name: 'leave_request_details', methods: ['GET'])]
+    #[Route('/leave-request/{id}', name: 'leave_request_details', methods: ['GET', 'POST'])]
     public function leaveRequestDetails(Request $request): Response
     {
         $id = $request->attributes->get('id');
         $leaveRequest = $this->leaveRequestQueryService->getLeaveRequestById($id);
         $comments = $this->commentService->getComments($id);
 
-        foreach ($comments as $comment) {
-            $comment['user'] = $this->userQueryService->getUserById($comment->getUserId());
-            $comment['replies'] = $this->commentService->getReplies($comment->getId());
-        }
+        $displayComments = [];
 
         foreach ($comments as $comment) {
-            foreach ($comment['replies'] as $reply) {
-                $reply['user'] = $this->userQueryService->getUserById($reply->getUserId());
+            $displayComments[] = $this->formatCommentWithReplies($comment);
+        }
+
+        $displayLeaveRequest = [
+            'request' => $leaveRequest,
+            'user' => $this->userQueryService->getUserById($leaveRequest->getUserId())
+        ];
+
+        $form = $this->createForm(PostCommentType::class);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            return $this->json($form->getErrors(), Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            try {
+                $this->commentService->addComment(new CommentCreationDTO(
+                    userId: $this->authenticationService->getAuthenticatedUser()->getId(),
+                    leaveRequestId: $id,
+                    parentCommentId: $data->getParentCommentId(),
+                    message: $data->getMessage()
+                ));
+            } catch (EntityNotFoundException $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_NOT_FOUND);
+            } catch (Exception $e) {
+                return $this->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         }
 
-        $leaveRequest['user'] = $this->userQueryService->getUserById($leaveRequest->getUserId());
-
-        return $this->render('employee/leave_request_details.html.twig', [
-            'leave_request' => $leaveRequest,
-            'comments' => $comments
-            ]);
+        return $this->render('leave_request/details.html.twig', [
+            'leave_request' => $displayLeaveRequest,
+            'comments' => $displayComments,
+            'form' => $form->createView()
+        ]);
     }
 
     #[Route('/leave-history', name: 'leave_history', methods: ['GET'])]
@@ -237,7 +265,7 @@ class PageController extends AbstractController
     {
         $user = $this->authenticationService->getAuthenticatedUser();
         $leaveRequests = $this->leaveRequestQueryService->getLeaveHistory($user->getId());
-        return $this->render('employee/leave_history.html.twig', ['leave_requests' => $leaveRequests]);
+        return $this->render('leave_history/index.html.twig', ['leave_requests' => $leaveRequests]);
     }
 
     #[Route('/notifications', name: 'notifications', methods: ['GET'])]
@@ -256,5 +284,27 @@ class PageController extends AbstractController
         $year = $now->format('Y');
         $calendar = $this->leaveRequestQueryService->getLeaveRequestsForTeamCalendar($teamId, $month, $year);
         return $this->render('team_calendar/index.html.twig', ['calendar' => $calendar]);
+    }
+
+    /**
+     * Helper method to format a comment with its replies recursively
+     *
+     * @param $comment
+     * @return array
+     */
+    private function formatCommentWithReplies($comment): array
+    {
+        $displayReplies = [];
+        $replies = $this->commentService->getReplies($comment->getId());
+
+        foreach ($replies as $reply) {
+            $displayReplies[] = $this->formatCommentWithReplies($reply);
+        }
+
+        return [
+            'comment' => $comment,
+            'user' => $this->userQueryService->getUserById($comment->getUserId()),
+            'replies' => $displayReplies
+        ];
     }
 }

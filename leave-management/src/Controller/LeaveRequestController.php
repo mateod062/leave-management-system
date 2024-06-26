@@ -134,13 +134,13 @@ class LeaveRequestController extends AbstractController
         return $this->render('leave_request/create.html.twig', ['form' => $form->createView()]);
     }
 
-    #[Route('/leave-requests/approve/{id}', name: 'approve_leave_request', methods: ['PUT'])]
+    #[Route('/leave-requests/approve/{id}', name: 'approve_leave_request', methods: ['GET'])]
     public function approveLeaveRequest(Request $request): JsonResponse
     {
         try {
             $leaveRequestId = $this->leaveRequestQueryService->getLeaveRequests(
                 new LeaveRequestFilterDTO(id: (int) $request->attributes->get('id'))
-            )[0];
+            )[0]->getId();
 
             $this->leaveRequestPersistenceService->approveLeaveRequest($leaveRequestId);
 
@@ -162,7 +162,7 @@ class LeaveRequestController extends AbstractController
         try {
             $leaveRequestId = $this->leaveRequestQueryService->getLeaveRequests(
                 new LeaveRequestFilterDTO(id: (int) $request->attributes->get('id'))
-            )[0];
+            )[0]->getId();
 
             $this->leaveRequestPersistenceService->rejectLeaveRequest($leaveRequestId);
 

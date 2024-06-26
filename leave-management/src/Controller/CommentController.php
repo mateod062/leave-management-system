@@ -48,7 +48,7 @@ class CommentController extends AbstractController
             $data = $form->getData();
 
             try {
-                $comment = $this->commentService->addComment(new CommentCreationDTO(
+                $this->commentService->addComment(new CommentCreationDTO(
                     userId: $this->authenticationService->getAuthenticatedUser()->getId(),
                     leaveRequestId: $request->attributes->get('leaveRequestId'),
                     parentCommentId: $data['parentCommentId'],

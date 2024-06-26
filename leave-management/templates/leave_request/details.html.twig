@@ -8,39 +8,34 @@
 <body>
 <div class="leave-request-details">
     <h1>Leave Request</h1>
-    <p>Start date: {{ leave_request.startDate|date('d/m/Y') }}</p>
-    <p>End date: {{ leave_request.endDate|date('d/m/Y') }}</p>
-    <p>Reason: {{ leave_request.reason }}</p>
+    <p>Start date: {{ leave_request.request.startDate|date('d/m/Y') }}</p>
+    <p>End date: {{ leave_request.request.endDate|date('d/m/Y') }}</p>
+    <p>Reason: {{ leave_request.request.reason }}</p>
     <p>User: {{ leave_request.user.username }}</p>
-    <p>Status: {{ leave_request.status }}</p>
+    <p>Status: {{ leave_request.request.status }}</p>
+
+    {% include 'comment/create.html.twig' %}
 
     <div class="comments">
         <h2>Comments</h2>
         {% for comment in comments %}
-            {% if comment.parentCommentId is null %}
+            {% if comment.comment.parentCommentId is null %}
                 <div class="comment">
-                    <p>{{ comment.comment }}</p>
+                    <p>{{ comment.comment.message }}</p>
                     <span>{{ comment.user.username }}</span>
-                    <a href="#" class="reply-button" data-comment-id="{{ comment.id }}">Reply</a>
+                    <a href="#" onclick="showReplyForm({{ comment.comment.id }})" class="reply-button">Reply</a>
                     {% include 'comment/replies.html.twig' with {'replies': comment.replies} %}
                 </div>
             {% endif %}
         {% endfor %}
     </div>
-
-    {% include 'comment/create.html.twig' %}
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.reply-button').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                document.getElementById('post_comment_parentCommentId').value = event.target.getAttribute('data-comment-id');
-                document.getElementById('post_comment_submit').value = 'Reply';
-            });
-        });
-    });
+    function showReplyForm(commentId) {
+        document.getElementById('post_comment_parentCommentId').value = commentId;
+        document.getElementById('post_comment_submit').innerText = 'Reply';
+    }
 </script>
 </body>
 </html>
