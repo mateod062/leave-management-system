@@ -14,6 +14,14 @@ interface NotificationServiceInterface
     public function getUserNotifications(): array;
 
     /**
+     * Create a notification
+     *
+     * @param NotificationDTO $notificationDTO
+     * @return NotificationDTO
+     */
+    public function createNotification(NotificationDTO $notificationDTO): NotificationDTO;
+
+    /**
      * Send a notification to a user
      *
      * @param NotificationDTO $notificationDTO

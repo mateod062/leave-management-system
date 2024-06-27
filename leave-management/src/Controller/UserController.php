@@ -6,6 +6,7 @@ use App\DTO\UserCreationDTO;
 use App\DTO\UserDTO;
 use App\Entity\UserRole;
 use App\Form\UserType;
+use App\Security\Voter\UserVoter;
 use App\Service\Auth\AuthenticationService;
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
 use App\Service\Mapper\MapperService;
@@ -88,6 +89,8 @@ class UserController extends AbstractController
     #[Route('/add-user', name: 'create_user', methods: ['GET', 'POST'])]
     public function createUser(Request $request): Response
     {
+        $this->denyAccessUnlessGranted(UserVoter::ADD, 'user');
+
         $form = $this->createForm(UserType::class);
 
         $form->handleRequest($request);
@@ -136,6 +139,8 @@ class UserController extends AbstractController
     #[Route('/edit-user/{id}', name: 'edit_user', methods: ['GET', 'POST'])]
     public function updateUser(Request $request): Response
     {
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, 'user');
+
         $userId = $request->attributes->get('id');
         $user = $this->userQueryService->getUserById($userId);
 
@@ -178,6 +183,8 @@ class UserController extends AbstractController
     #[Route('/users/{id}', name: 'delete_user', methods: ['DELETE'])]
     public function deleteUser(Request $request): JsonResponse
     {
+        $this->denyAccessUnlessGranted(UserVoter::DELETE, 'user');
+
         try {
             $this->userPersistenceService->deleteUser($request->attributes->get('id'));
             return $this->json(['message' => 'User deleted successfully']);

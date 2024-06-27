@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>New Comment Posted</h1>
+    <p>Dear {{ comment.user.username }},</p>
+    <p>A new comment has been posted on your leave request from {{ comment.leaveRequest.startDate|date('Y-m-d') }} to {{ comment.leaveRequest.endDate|date('Y-m-d') }}.</p>
+    <p>Comment: {{ comment.message }}</p>
+    <p>If you have any questions, please contact your team lead or project manager.</p>
+    <p>Best regards,<br>Leave Management System</p>
+{% endblock %}

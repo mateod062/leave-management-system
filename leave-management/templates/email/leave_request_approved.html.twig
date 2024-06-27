@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Leave Request Approved</h1>
+    <p>Dear {{ leaveRequest.user.username }},</p>
+    <p>We are pleased to inform you that your leave request from {{ leaveRequest.startDate|date('Y-m-d') }} to {{ leaveRequest.endDate|date('Y-m-d') }} has been approved.</p>
+    <p>Reason for leave: {{ leaveRequest.reason }}</p>
+    <p>Enjoy your leave!</p>
+    <p>Best regards,<br>Leave Management System</p>
+{% endblock %}

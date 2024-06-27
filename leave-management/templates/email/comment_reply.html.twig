@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Comment Reply Notification</h1>
+    <p>Dear {{ comment.parentComment.user.username }},</p>
+    <p>Your comment on the leave request from {{ comment.leaveRequest.startDate|date('Y-m-d') }} to {{ comment.leaveRequest.endDate|date('Y-m-d') }} has received a reply.</p>
+    <p>Original comment: {{ comment.parentComment.message }}</p>
+    <p>Reply: {{ comment.message }}</p>
+    <p>If you have any questions, please contact your team lead or project manager.</p>
+    <p>Best regards,<br>Leave Management System</p>
+{% endblock %}

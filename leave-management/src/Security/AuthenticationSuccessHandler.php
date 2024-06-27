@@ -10,24 +10,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 
 class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
-
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
     {
-        $role = $token->getRoleNames();
-
-        $targetPath = $this->getDefaultTargetPath($role[0]);
-
-        return new RedirectResponse($targetPath);
-    }
-
-    private function getDefaultTargetPath(string $role): string
-    {
-        return match ($role) {
-            'ROLE_ADMIN' => '/admin/dashboard',
-            'ROLE_EMPLOYEE' => '/employee/dashboard',
-            'ROLE_PROJECT_MANAGER' => '/project-manager/dashboard',
-            'ROLE_TEAM_LEAD' => '/team-lead/dashboard',
-            default => '/',
-        };
+        return new RedirectResponse('/home');
     }
 }

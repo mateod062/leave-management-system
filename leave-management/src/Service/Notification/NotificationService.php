@@ -4,6 +4,9 @@ namespace App\Service\Notification;
 
 use App\DTO\NotificationDTO;
 use App\Entity\Notification;
+use App\Entity\User;
+use App\Message\NotificationEmailMessage;
+use App\Message\NotificationMessage;
 use App\Repository\NotificationRepository;
 use App\Service\Auth\AuthenticationService;
 use App\Service\Comment\CommentService;
@@ -16,6 +19,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use ReflectionException;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class NotificationService implements NotificationServiceInterface
 {
@@ -28,11 +32,12 @@ class NotificationService implements NotificationServiceInterface
         private readonly UserQueryService $userQueryService,
         private readonly CommentService $commentService,
         private readonly TeamService $teamService,
-        private readonly MapperService $mapperService
+        private readonly MapperService $mapperService,
+        private readonly MessageBusInterface $bus
     ) {}
 
     /**
-     * @throws ReflectionException
+     * @throws ReflectionException|ORMException
      */
     public function getUserNotifications(): array
     {
@@ -42,15 +47,24 @@ class NotificationService implements NotificationServiceInterface
     }
 
     /**
-     * @throws ReflectionException
      * @throws OptimisticLockException
      * @throws ORMException
+     * @throws ReflectionException
      */
-    public function sendNotification(NotificationDTO $notificationDTO): void
+    public function createNotification(NotificationDTO $notificationDTO): NotificationDTO
     {
         $notification = $this->mapperService->mapToEntity($notificationDTO);
 
-        $this->notificationRepository->save($notification);
+        return $this->mapperService->mapToDTO($this->notificationRepository->save($notification));
+    }
+
+    public function sendNotification(NotificationDTO $notificationDTO): void
+    {
+        $message = new NotificationMessage(
+            userId: $notificationDTO->getUserId(),
+            message: $notificationDTO->getMessage()
+        );
+        $this->bus->dispatch($message);
     }
 
     /**
@@ -63,6 +77,12 @@ class NotificationService implements NotificationServiceInterface
         foreach ($users as $user) {
             $this->sendNotification(new NotificationDTO(message: $message, userId: $user));
         }
+    }
+
+    public function sendEmailNotification(User $recipient, string $subject, string $template, array $context): void
+    {
+        $message = new NotificationEmailMessage($recipient->getEmail(), $subject, $template, $context);
+        $this->bus->dispatch($message);
     }
 
     /**
@@ -149,7 +169,7 @@ class NotificationService implements NotificationServiceInterface
     }
 
     /**
-     * @throws ReflectionException
+     * @throws ReflectionException|ORMException
      */
     public function clearNotifications(): void
     {

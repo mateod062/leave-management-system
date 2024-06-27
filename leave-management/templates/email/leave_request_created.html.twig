@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>New Leave Request Created</h1>
+    <p>Dear {{ recipient.username }},</p>
+    <p>A new leave request has been created by {{ leaveRequest.user.username }}.</p>
+    <p>Leave Details:</p>
+    <ul>
+        <li><strong>Start Date:</strong> {{ leaveRequest.startDate|date('Y-m-d') }}</li>
+        <li><strong>End Date:</strong> {{ leaveRequest.endDate|date('Y-m-d') }}</li>
+        <li><strong>Reason:</strong> {{ leaveRequest.reason }}</li>
+    </ul>
+    <p>Please review and approve or reject the leave request.</p>
+    <p>Best regards,<br>Leave Management System</p>
+{% endblock %}

@@ -22,27 +22,22 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\EventSubscriber\LeaveRequestApprovedSubscriber:
-        tags:
-            - { name: 'kernel.event_subscriber' }
-    App\EventSubscriber\LeaveRequestRejectedSubscriber:
-        tags:
-            - { name: 'kernel.event_subscriber' }
+
     App\EventSubscriber\UserCreationSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
-    App\EventSubscriber\LeaveRequestCreatedSubscriber:
+    App\EventSubscriber\LeaveRequestSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
-    App\EventSubscriber\CommentPostedSubscriber:
-        tags:
-            - { name: 'kernel.event_subscriber' }
-
-    App\EventSubscriber\CommentReplySubscriber:
+    App\EventSubscriber\CommentSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
 
     App\Validator\Constraints\ValidLeaveRequestDatesValidator:
         tags:
             - { name: 'validator.constraint_validator', alias: 'valid_leave_request_dates_validator' }
+
+    App\Security\Voter\UserVoter:
+        tags:
+            - { name: 'security.voter' }
 

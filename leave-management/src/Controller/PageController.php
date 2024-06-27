@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\DTO\CommentCreationDTO;
 use App\DTO\LeaveRequestDTO;
 use App\DTO\LeaveRequestFilterDTO;
+use App\Entity\UserRole;
 use App\Form\LeaveRequestCreationType;
 use App\Form\PostCommentType;
 use App\Service\Auth\Interface\AuthenticationServiceInterface;
@@ -40,9 +41,20 @@ class PageController extends AbstractController
         private readonly UserQueryServiceInterface $userQueryService
     ) {}
 
+    #[Route('/home', name: 'home', methods: ['GET', 'POST', 'PUT', 'DELETE'])]
+    public function dashboard(Request $request): Response
+    {
+        $user = $this->authenticationService->getAuthenticatedUser();
 
-    #[Route('/admin/dashboard', name: 'admin_dashboard', methods: ['GET'])]
-    public function adminDashboard(): Response
+        return match ($user->getRole()) {
+            UserRole::ROLE_ADMIN->value => $this->adminDashboard(),
+            UserRole::ROLE_PROJECT_MANAGER->value => $this->projectManagerDashboard($request),
+            UserRole::ROLE_TEAM_LEAD->value => $this->teamLeadDashboard($request),
+            default => $this->employeeDashboard($request),
+        };
+    }
+
+    private function adminDashboard(): Response
     {
         $user = $this->authenticationService->getAuthenticatedUser();
         $users = $this->userQueryService->getUsers();
@@ -65,8 +77,7 @@ class PageController extends AbstractController
         ]);
     }
 
-    #[Route('/project-manager/dashboard', name: 'project_manager_dashboard', methods: ['GET', 'POST', 'PUT'])]
-    public function projectManagerDashboard(Request $request): Response
+    private function projectManagerDashboard(Request $request): Response
     {
         $user = $this->authenticationService->getAuthenticatedUser();
         $myLeaveRequests = $this->leaveRequestQueryService->getLeaveRequests(new LeaveRequestFilterDTO(
@@ -118,8 +129,7 @@ class PageController extends AbstractController
             ]);
     }
 
-    #[Route('/team-lead/dashboard', name: 'team_lead_dashboard', methods: ['GET', 'POST', 'PUT'])]
-    public function teamLeadDashboard(Request $request): Response
+    private function teamLeadDashboard(Request $request): Response
     {
         $user = $this->authenticationService->getAuthenticatedUser();
         $leaveRequests = $this->leaveRequestQueryService->getLeaveRequestsForApprover();
@@ -171,8 +181,7 @@ class PageController extends AbstractController
         ]);
     }
 
-    #[Route('/employee/dashboard', name: 'employee_dashboard', methods: ['GET', 'POST'])]
-    public function employeeDashboard(Request $request): Response
+    private function employeeDashboard(Request $request): Response
     {
         $user = $this->authenticationService->getAuthenticatedUser();
         $leaveRequests = $this->leaveRequestQueryService->getLeaveRequests(new LeaveRequestFilterDTO(
